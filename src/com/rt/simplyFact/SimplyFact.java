@@ -93,7 +93,7 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item2_3=new JMenuItem("Retrouver Patients Effaces");
 	private JMenuItem item3_1=new JMenuItem("A Propos");
 	private JMenuItem item3_2=new JMenuItem("Stats");
-	private String version="1.2.3";
+	private String version="1.2.3.1";
 	public Cabinet cab=new Cabinet();
 	private Splash spl=new Splash(null,"A Propos...",true);
 	//public NewPatDialog newFichePat; 
