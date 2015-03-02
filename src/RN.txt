@@ -1,0 +1,93 @@
+release notes :
+---------------
+- DONE : ajouter bouton modif cot° a chaque ligne
+- DONE : nombre de lignes selctionnées dans row 0
+- DONE :importCsv
+	--> DONE : file chooser
+	--> DONE : lire les champs comme spec writeCsv
+- DONE : desynchroniser tableau et patients (getPatientIdx(String))
+- DONE : modifier class patient : ajouter defCot(matin,midi,soir)
+- DONE : importCsv : import ECO...
+- DONE : ajout widget date a main window
+- DONE : fiche patient
+- DONE : update liste selected en fonction de hasActe(date)
+- DONE : removeActe(date)+effet dans liste selection change listener
+- DONE : action event combobox dans fichpat
+- DONE : export pdf
+- DONE : clear db / save db : demander si ecraser
+- DONE / export pdf : ajout civilite
+- DONE : export pdf pour fichePat ?
+- DONE : appliquer MVC a fichpat ?
+- DONE :jdialog pour modifier la cotation (3 combobox)
+	--> DONE : jdialog pour creer une nouvelle cotation
+- DONE : ajout patient
+- DONE : trier liste patients apres add new patient ou readcsv
+- DONE : bouton set def cotations dans newPatDialog
+- DONE : save when exit
+- DONE : set / reset visibility
+- DONE : focus nouveau patient
+- DONE : variable globale : modified -> pas besoin d'afficher le dialogue de confirmation avant de quitter si !modified
+- DONE : modifier resultat cotation en prenant en compte IK -4 
+- DONE : afficher titres graphs dans stats
+- DONE : modified tjs a 1
+- DONE : logo VF dans ressources !
+- DONE : modifier nom/prenom/adresse
+- DONE : stats
+V 1.2 :
+-------
+- DONE : menus
+- DONE : lire & merge fdb
+- DONE : si nouveau patient dont le nom est le meme qu'un patient non visible ?
+- DONE : splash screen
+- DONE : effacer patients inactifs 
+- DONE : resolu bug sauvegarde postModif.fdb anterieur a .fdb
+- DONE : data recovery accessible par menu
+V1.2.1 :
+--------
+- DONE : resolu bug set db version
+- DONE : resolu bug exception quand pas de fichier archive present
+- DONE : resolu bug path absolu dans lecture csv / fdb
+V1.2.2 :
+--------
+- DONE : recompilation : newCotDialog ne s'ouvrait pas
+V1.2.3 :
+--------
+- DONE : formatter nom / prenom patients (mjuscule minuscule) apres add new ou read csv + trim
+- DONE MAJ ==> db version v1.2
+- DONE : facturation exportee dans .\Facturation\, listes exportees dans .\Listes\ 
+- DONE : ajout syncPath dans cab, addSyncPath
+
+
+
+TBD :
+-----
+- synchronisation db avec disque cloud
+- deplacer archives dans .\Archives\
+- trim espaces redondants dans nom, prenom
+- ajout specification soignant...
+- 3 colonnes a cocher pour matin midi et soir au lieu de 1 seule pour les 3.
+- si une date est specifiee dans import csv, ajout actes par defaut a la date donnée...
+- writeCsv (inclure tous les champs)
+	--> passer la date courante en parametre
+	--> export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
+- effacer patients inactifs : specifier date
+- runtime avec big db... generateur de db aleatoire ... /
+	-> ne pas prendre en compte patients non visibles 
+	-> affichage stats dynamique ?
+	-> stocker sommes de cotation / nb actes dans cabinet ?
+- majDim auto ?
+- effacer cotations inutilisees (accessible par menu)
+- cotation totale dans PDF ?
+- bouton calendar ? combobox ?
+- dont scroll row(0) ?
+- jdialog pour chaque stacktrace
+- fichiers exportes : lesquels demander si ecraser ?
+- scan / view pdf a partir de fichpat ?
+- augmenter taille listes cotations / diminuer taille liste actes dans fichepat
+
+Bugs :
+------
+essayer importCsv avec un patient sans cotation
+si importCsv plante : gestion exception
+
+
