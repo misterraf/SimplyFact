@@ -1,7 +1,7 @@
 release notes :
 ---------------
-- DONE : ajouter bouton modif cot° a chaque ligne
-- DONE : nombre de lignes selctionnées dans row 0
+- DONE : ajouter bouton modif cotÂ° a chaque ligne
+- DONE : nombre de lignes selctionnÃ©es dans row 0
 - DONE :importCsv
 	--> DONE : file chooser
 	--> DONE : lire les champs comme spec writeCsv
@@ -66,7 +66,7 @@ TBD :
 - trim espaces redondants dans nom, prenom
 - ajout specification soignant...
 - 3 colonnes a cocher pour matin midi et soir au lieu de 1 seule pour les 3.
-- si une date est specifiee dans import csv, ajout actes par defaut a la date donnée...
+- si une date est specifiee dans import csv, ajout actes par defaut a la date donnÃ©e...
 - writeCsv (inclure tous les champs)
 	--> passer la date courante en parametre
 	--> export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
@@ -85,9 +85,30 @@ TBD :
 - scan / view pdf a partir de fichpat ?
 - augmenter taille listes cotations / diminuer taille liste actes dans fichepat
 
+- un seul fichier db dans un serveur dedie ?
+- mecanisme de sauvegarde / synchro
+
 Bugs :
 ------
 essayer importCsv avec un patient sans cotation
 si importCsv plante : gestion exception
 
+Nouvelles features :
+--------------------
+export listes:
+- Ajout menu deroulant soigants en haut de la liste, et pour les stats (+all) ?
+- en mode "tous soignants", desactiver edition de liste
 
+import liste:
+- demander import pour quel soignant (menu deroult)
+- confirmer chaque ajout, avec option oui pour tous. 
+- si ajout existe deja, ne pas demander
+- tolerance sur nom / prenom (desalignement nom patient dans la db entre <> soigants) : s'il nexiste pas, demander creer ou rattacher a patient existant
+- si import d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
+
+ajout acte 
+- si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
+
+
+stats :
+stats par soignant, stats pour le cabinet
