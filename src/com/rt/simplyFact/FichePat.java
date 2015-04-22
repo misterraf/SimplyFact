@@ -34,6 +34,7 @@ public class FichePat extends JFrame {
 	private JLabel label8 =new JLabel();
 	private String mois;
 	private String annee;
+	private String soignant;
 	protected Patient pat;
 	private JTable acteTable1;
 	private JTable acteTable2;
@@ -218,20 +219,21 @@ public class FichePat extends JFrame {
 		//this.setVisible(true);                             
 	}
 	public void updateDataMois(String mois){
-		fillData(mois,this.annee);
+		fillData(mois,this.annee,this.soignant);
 	}
 	public void updateDataAnnee(String annee){
-		fillData(this.mois,annee);
+		fillData(this.mois,annee,this.soignant);
 	}
-	public void setFichePatInfo(Patient pat,String mois,String annee){
+	public void setFichePatInfo(Patient pat,String mois,String annee, String soignant){
 		if (pat!=null){
 			this.pat=pat;
 		}
 		this.mois=mois;
 		this.annee=annee;
-		fillData(mois,annee);
+		this.soignant=soignant;
+		fillData(mois,annee,soignant);
 	}
-	public void fillData(String mois,String annee){
+	public void fillData(String mois,String annee,String soignant){
 		lbNom.setText("Nom : "+pat.toString());
 		lbAddr.setText("Adresse : "+pat.getAdresse());
 		lbTel.setText("Tél : "+pat.getTel());
@@ -244,7 +246,7 @@ public class FichePat extends JFrame {
 			dataList.addElement(pat.getCotList().get(i).toStringComment());
 		}
 
-		CotationsMois cots=pat.getCotListMois(mois, annee);
+		CotationsMois cots=pat.getCotListMois(mois, annee, soignant);
 		dataList2.clear();
 		for(int i=0;i<cots.getCotStr().size();i++){
 			dataList2.addElement(cots.getCotStr().get(i).toString());
@@ -357,7 +359,7 @@ public class FichePat extends JFrame {
 		public void actionPerformed(ActionEvent event) {
 			if (pat.hasActe(mois, annee)) {
 				PdfWrite doc=new PdfWrite();
-				doc.exportPdf(pat, mois, annee);
+				doc.exportPdf(pat, mois, annee,soignant);
 			} else {
 				JOptionPane.showMessageDialog(null, "Pas d'actes pour ce patient en "+mois+"/"+annee,"Erreur",JOptionPane.ERROR_MESSAGE);
 

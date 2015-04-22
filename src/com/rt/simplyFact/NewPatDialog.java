@@ -162,7 +162,8 @@ public class NewPatDialog extends JDialog{
 		public Component getFirstComponent(Container focusCycleRoot) {
 			return order.get(0);
 		}
-	}	public Patient showNewPatDialog(){
+	}	
+	public Patient showNewPatDialog(){
 		this.sendData = false;
 		this.setVisible(true);      
 		return this.pat;      

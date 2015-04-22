@@ -32,8 +32,10 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -62,6 +64,7 @@ public class SimplyFact extends JFrame {
 	private ImageIcon btnIcon10 = new ImageIcon(getClass().getResource("/right.png"));
 	private ImageIcon btnIcon11 = new ImageIcon(getClass().getResource("/Calendar.png"));
 	private ImageIcon btnIcon12 = new ImageIcon(getClass().getResource("/chart.png"));
+	private ImageIcon btnIcon13 = new ImageIcon(getClass().getResource("/delete-small.png"));
 	private JButton importCsvBtn = new JButton(btnIcon6);
 	private JButton saveBtn = new JButton(btnIcon2);
 	private JButton expPdfBtn = new JButton(btnIcon3);
@@ -71,8 +74,11 @@ public class SimplyFact extends JFrame {
 	private JButton leftArrowBtn = new JButton(btnIcon9);
 	private JButton rightArrowBtn = new JButton(btnIcon10);
 	private JButton calendarBtn = new JButton(btnIcon11);
+	private JButton addSoignantBtn = new JButton(btnIcon4);
+	private JButton delSoignantBtn = new JButton(btnIcon13);
 	private JTextField dateEntry=new JTextField();
 	private String crtSoignant="";
+	private Patient crtPat=null;
 	private Date crtDate=new Date();
 	private FichePat fp;
 	private FicheStats fs;
@@ -91,9 +97,12 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item2_2=new JMenuItem("Effacer Patients Selectionnes");
 	private JMenuItem item2_4=new JMenuItem("Effacer Patients Inactifs");
 	private JMenuItem item2_3=new JMenuItem("Retrouver Patients Effaces");
+	private JMenuItem item2_5=new JMenuItem("Affecter Actes passés");
 	private JMenuItem item3_1=new JMenuItem("A Propos");
 	private JMenuItem item3_2=new JMenuItem("Stats");
-	private String version="1.2.3.1";
+	private JMenuItem item3_3=new JMenuItem("Debug : liste actes du jour");
+	private JComboBox soignantCB=new JComboBox();
+	private String version="2.0";
 	public Cabinet cab=new Cabinet();
 	private Splash spl=new Splash(null,"A Propos...",true);
 	//public NewPatDialog newFichePat; 
@@ -118,8 +127,10 @@ public class SimplyFact extends JFrame {
 		this.menu2.add(item2_2);
 		this.menu2.add(item2_4);
 		this.menu2.add(item2_3);
+		this.menu2.add(item2_5);
 		this.menu3.add(item3_1);
 		this.menu3.add(item3_2);
+		this.menu3.add(item3_3);
 		this.menuBar.add(menu1);
 		this.menuBar.add(menu2);
 		this.menuBar.add(menu3);
@@ -129,6 +140,7 @@ public class SimplyFact extends JFrame {
 	private void createWin(){
 		BorderLayout b = new BorderLayout();
 		JPanel btnPanel=new JPanel();
+		JPanel selSoignantPanel=new JPanel();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 
 		this.setLayout(b);
@@ -140,6 +152,18 @@ public class SimplyFact extends JFrame {
 		btnPanel.add(expPdfBtn);
 		btnPanel.add(expXlsBtn);
 		btnPanel.add(statsBtn);
+		selSoignantPanel.add(new JLabel("Utilisateur:"));
+
+		selSoignantPanel.add(soignantCB);
+		selSoignantPanel.add(addSoignantBtn);
+		selSoignantPanel.add(delSoignantBtn);
+		addSoignantBtn.setPreferredSize(new Dimension(24,24));
+		delSoignantBtn.setPreferredSize(new Dimension(24,24));
+		soignantCB.setPreferredSize(new Dimension(250,24));
+		soignantCB.addActionListener(new SelComboChange());
+		addSoignantBtn.addActionListener(new AddSoignantListener());
+		delSoignantBtn.addActionListener(new DelSoignantListener());
+		
 		importCsvBtn.setToolTipText("Import Excel .CSV");
 		clearBtn.setToolTipText("Effacer toutes les données");
 		saveBtn.setToolTipText("Sauvegarder les données");
@@ -147,6 +171,7 @@ public class SimplyFact extends JFrame {
 		expXlsBtn.setToolTipText("Exporter la liste des patients selectionnés (.CSV)");
 		statsBtn.setToolTipText("Statistiques");
 		this.getContentPane().add(btnPanel,BorderLayout.SOUTH);
+		this.getContentPane().add(selSoignantPanel,BorderLayout.NORTH);
 		Box box=new Box(BoxLayout.Y_AXIS);
 		Box box2=new Box(BoxLayout.X_AXIS);
 		JPanel listePanel=new JPanel(new BorderLayout());
@@ -185,10 +210,6 @@ public class SimplyFact extends JFrame {
 		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				//System.out.println("change...");
-				SimpleDateFormat sdfM = new SimpleDateFormat("MM");
-				SimpleDateFormat sdfA = new SimpleDateFormat("yyyy");
-				String mois=sdfM.format(crtDate);
-				String annee=sdfA.format(crtDate);
 				Boolean selectedData = null;
 				int[] selectedRow = tableau.getSelectedRows();
 				int[] selectedColumns = tableau.getSelectedColumns();
@@ -202,23 +223,33 @@ public class SimplyFact extends JFrame {
 								if (selectedData==false){
 									// idx : cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString())
 									pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString()));
-									pat.addActe(crtDate);
+									if (cab.getCrtSoignant()>=0){
+										pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+									} else {
+										pat.addActe(crtDate);
+									}
 									pat.select();
 									System.out.println(crtDate+" selecting : "+pat.toString());
 									//									System.out.println("selection patient : "+cab.patients.get(selectedRow[i]-1).isSelected());
 									//									System.out.println("selection patient : "+tableau.getValueAt(selectedRow[i], 1).toString());
 									//									System.out.println("selection patient idx : "+cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString()));
 									nbPatSelected++;
+									cab.setModified(true);
 									refreshData(pat);
 
 
 								} else {
 									pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString()));
-									pat.removeActe(crtDate);
+									if (cab.getCrtSoignant()>=0){
+										pat.removeActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+									} else {
+										pat.removeActe(crtDate);
+									}
 									pat.deselect();
-									System.out.println("deselecting : "+cab.patients.get(selectedRow[i]-1).toString());
+									System.out.println("deselecting : "+pat.toString());
 									//									System.out.println("selection patient : "+cab.patients.get(selectedRow[i]-1).isSelected());
 									nbPatSelected--;
+									cab.setModified(true);
 									refreshData(pat);
 
 								}
@@ -229,7 +260,11 @@ public class SimplyFact extends JFrame {
 										tableau.setValueAt(true, k, 2);
 										pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(k, 1).toString()));
 										pat.select();
-										pat.addActe(crtDate);
+										if (cab.getCrtSoignant()>=0){
+											pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+										} else {
+											pat.addActe(crtDate);
+										}
 										//										
 										//cab.patients.get(k-1).select();
 										nbPatSelected++;
@@ -243,13 +278,18 @@ public class SimplyFact extends JFrame {
 									for (int k=1;k<tableau.getRowCount();k++) {
 										tableau.setValueAt(false, k, 2);
 										pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(k, 1).toString()));
-										pat.removeActe(crtDate);
+										if (cab.getCrtSoignant()>=0){
+											pat.removeActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+										} else {
+											pat.removeActe(crtDate);
+										}
 										pat.deselect();
 
 										//cab.setModified(true);
 										//tableau.setValueAt("Nb Patients Sélectionnés : "+nbPatSelected+"/"+cab.getSize(), 0, 1);
 
 									}
+									cab.setModified(true);
 									refreshData(null);
 
 								}
@@ -260,8 +300,9 @@ public class SimplyFact extends JFrame {
 					}
 				}
 				tableau.clearSelection();
+				updateListSelection();
 			}	
-
+			
 		});
 		listePanel.add(new JScrollPane(tableau));
 		this.getContentPane().add(box, BorderLayout.CENTER);
@@ -280,14 +321,21 @@ public class SimplyFact extends JFrame {
 			public void windowClosing(WindowEvent e) {
 				if (cab.isModified()){
 					cab.setModified(false);
-					boolean test=cab.isModified();
+					//boolean test=cab.isModified();
 					int confirm = JOptionPane.showOptionDialog(null, "Voulez-vous enregistrer vos modifications avant de quitter ?", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 					if (confirm == 0) {
 						Date date=new Date();
-						String fileName="archive_";
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-						fileName=fileName+sdf.format(date)+".postModif.fdb";
+						File dir=new File("Archives");
+						if (!dir.exists()){
+							dir.mkdir();
+						}
+						String fileName="Archives\\archive_";
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+						fileName=fileName+sdf.format(date)+".fdb";
 						writeArchive(cab,fileName,false);
+						File f=new File("archive_crt.fdb");
+						if (f.exists()){f.delete();}
+						writeArchive(cab,"archive_crt.fdb",false);
 					}
 				}
 				System.exit(0);
@@ -306,8 +354,10 @@ public class SimplyFact extends JFrame {
 		item2_2.addActionListener(new ClearSelMenuListener());
 		item2_4.addActionListener(new ClearInactMenuListener());
 		item2_3.addActionListener(new RecoverPatMenuListener());
+		item2_5.addActionListener(new AssignActesMenuListener());
 		item3_1.addActionListener(new AboutMenuListener());
 		item3_2.addActionListener(new StatsBtnListener());
+		item3_3.addActionListener(new DebugListener());
 	}
 
 	class RecoverPatMenuListener implements ActionListener{
@@ -335,8 +385,16 @@ public class SimplyFact extends JFrame {
 					}
 				}
 				refreshList();
+				cab.setModified(true);
 				refreshData(null);
 			}
+		}
+
+	}
+
+	class AssignActesMenuListener implements ActionListener{
+		public void actionPerformed(ActionEvent arg){
+			assignActesToCrtSoignant();
 		}
 
 	}
@@ -345,14 +403,21 @@ public class SimplyFact extends JFrame {
 		public void actionPerformed(ActionEvent arg){
 			if (cab.isModified()){
 				cab.setModified(false);
-				boolean test=cab.isModified();
+				//boolean test=cab.isModified();
 				int confirm = JOptionPane.showOptionDialog(null, "Voulez-vous enregistrer vos modifications avant de quitter ?", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 				if (confirm == 0) {
 					Date date=new Date();
-					String fileName="archive_";
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-					fileName=fileName+sdf.format(date)+".postModif.fdb";
+					File dir=new File("Archives");
+					if (!dir.exists()){
+						dir.mkdir();
+					}
+					String fileName="Archives\\archive_";
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+					fileName=fileName+sdf.format(date)+".fdb";
 					writeArchive(cab,fileName,false);
+					File f=new File("archive_crt.fdb");
+					if (f.exists()){f.delete();}
+					writeArchive(cab,"archive_crt.fdb",false);
 				}
 			}
 			System.exit(0);
@@ -375,6 +440,18 @@ public class SimplyFact extends JFrame {
 			
 		}
 
+	}
+	class SelComboChange implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			//System.out.println("sel:"+soignantCB.getSelectedIndex());
+			if (soignantCB.getSelectedIndex()>=0){
+				cab.setCrtSoignant(soignantCB.getSelectedIndex());
+				crtSoignant=cab.soignants.get(cab.getCrtSoignant()).toString();
+				disableControlsOnSoignant();
+				updateListSelection();
+				refreshData(crtPat);
+			}
+		}
 	}
 
 	public class ButtonEditor extends DefaultCellEditor {
@@ -418,7 +495,6 @@ public class SimplyFact extends JFrame {
 			public JButton getButton(){return this.button;}
 
 			public void actionPerformed(ActionEvent event) {
-				//On affiche un message mais vous pourriez faire ce que vous voulez
 				if (row==0) {
 					NewPatDialog npd=new NewPatDialog(null,"Nouveau Patient",true);
 					Patient newPat=new Patient();
@@ -428,6 +504,7 @@ public class SimplyFact extends JFrame {
 						cab.addPatient(newPat);
 						Object[] newdonnee = new Object[]	{btnIcon1,newPat.toString(),new Boolean(false),btnIcon7};
 						((ZModel)tableau.getModel()).addRow(newdonnee);
+						cab.setModified(true);
 						refreshData(newPat);
 					} else {
 						//System.out.println("cancelled");
@@ -456,7 +533,7 @@ public class SimplyFact extends JFrame {
 
 
 						fp=new FichePat();
-						fp.setFichePatInfo(pat, mois, annee);
+						fp.setFichePatInfo(pat, mois, annee, crtSoignant);
 						fp.setVisible(true);
 						fp.changeBtn.addActionListener(new ChangeBtnListener());
 					}	else {
@@ -472,8 +549,15 @@ public class SimplyFact extends JFrame {
 								DefCotModel newDefCot=new DefCotModel();
 								newDefCot = dcd.showDefCotDialog(); 
 								if(!dcm.getCancelled()){
+									String soignant="";
 									cab.patients.get(idx).setCotList(dcm.getListCot());
-									cab.patients.get(idx).removeActe(crtDate);
+									if (cab.getCrtSoignant()>=0){
+										soignant=cab.soignants.get(cab.getCrtSoignant());
+										cab.patients.get(idx).removeActe(crtDate,soignant);
+									} else {
+										cab.patients.get(idx).removeActe(crtDate);
+									}
+									
 									if (dcm.getDefault()){
 										cab.patients.get(idx).setDefCotMatin(dcm.getDefCotMatin());
 										cab.patients.get(idx).setDefCotMidi(dcm.getDefCotMidi());
@@ -482,22 +566,38 @@ public class SimplyFact extends JFrame {
 
 									if (!dcm.getDefCotMatin().toString().equals("")){
 										DateJour dj=new DateJour(crtDate,Jour.matin);
-										Acte newAct =new Acte(dcm.getDefCotMatin(),dj);
+										Acte newAct;
+										if (soignant.equals("")){
+											newAct =new Acte(dcm.getDefCotMatin(),dj);
+										} else {
+											newAct =new Acte(dcm.getDefCotMatin(),dj,soignant);
+										}
 										cab.patients.get(idx).addActe(newAct);
 
 									}
 									if (!dcm.getDefCotMidi().toString().equals("")){
 										DateJour dj=new DateJour(crtDate,Jour.midi);
-										Acte newAct =new Acte(dcm.getDefCotMidi(),dj);
+										Acte newAct;
+										if (soignant.equals("")){
+											newAct=new Acte(dcm.getDefCotMidi(),dj);
+										} else {
+											newAct=new Acte(dcm.getDefCotMidi(),dj,soignant);
+										}
 										cab.patients.get(idx).addActe(newAct);
 
 									}
 									if (!dcm.getDefCotSoir().toString().equals("")){
 										DateJour dj=new DateJour(crtDate,Jour.soir);
-										Acte newAct =new Acte(dcm.getDefCotSoir(),dj);
+										Acte newAct;
+										if (soignant.equals("")){
+											newAct=new Acte(dcm.getDefCotSoir(),dj);
+										} else {
+											newAct=new Acte(dcm.getDefCotSoir(),dj,soignant);
+										}
 										cab.patients.get(idx).addActe(newAct);
 
 									}
+									cab.setModified(true);
 									refreshData(pat);
 
 								}
@@ -505,12 +605,6 @@ public class SimplyFact extends JFrame {
 						}
 					}
 				}
-				//On affecte un nouveau libellé à une celulle de la ligne
-				//((AbstractTableModel)table.getModel()).setValueAt("New Value " + (++nbre), this.row, (this.column +1));
-				//Permet de dire à notre tableau qu'une valeur a changé
-				//à l'emplacement déterminé par les valeurs passées en paramètres
-				//((AbstractTableModel)table.getModel()).fireTableCellUpdated(this.row, this.column + 1);
-				//this.button = ((JButton)event.getSource());
 			}
 		}
 	}
@@ -542,6 +636,7 @@ public class SimplyFact extends JFrame {
 				oldPat.setPrenom(newPat.getPrenom());
 				oldPat.setAdresse(newPat.getAdresse());
 				oldPat.setTel(newPat.getTel());
+				cab.setModified(true);
 				refreshData(oldPat);
 				refreshList();
 				//fillData(mois,annee);
@@ -562,36 +657,48 @@ public class SimplyFact extends JFrame {
 
 		}
 	}	
+	class DebugListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			SimpleDateFormat sdfM = new SimpleDateFormat("MM");
+			String mois=sdfM.format(crtDate);
+			SimpleDateFormat sdfA = new SimpleDateFormat("yyyy");
+			String annee=sdfA.format(crtDate);
+			System.out.println("Liste:\n------");
+			for (int i=0;i<cab.patients.size();i++){
+				Patient pat=cab.patients.get(i);
+				for (int j=0;j<pat.getActe(mois, annee).size();j++){
+					System.out.println(pat.toString()+":"+pat.getActe(mois,annee).get(j)+" ordre : "+pat.getActe(mois,annee).get(j).getOrder());
+				}
+			}
+		}
+	}	
 	class SaveBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			Date date=new Date();
-			String fileName="archive_";
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			String fileNamePost=fileName+sdf.format(date)+".postModif.fdb";
-			String fileNamePatch=fileName+sdf.format(date)+".patched.fdb";
-			fileName=fileName+sdf.format(date)+".fdb";
+			String fileNameArch="Archives\\archive_";
+			String fileName="archive_crt.fdb";
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+			//String fileNamePost=fileName+sdf.format(date)+".postModif.fdb";
+			//String fileNamePatch=fileName+sdf.format(date)+".patched.fdb";
+			fileNameArch=fileNameArch+sdf.format(date)+".fdb";
+			File fArch = new File(fileNameArch); 
 			File f = new File(fileName); 
-			File fPost = new File(fileNamePost); 
-			File fPatch = new File(fileNamePatch); 
+			File dir=new File("Archives");
+			if (!dir.exists()) {
+				dir.mkdir();
+			}
+			if (!f.exists()) {
+				f.delete();
+			}
+			writeArchive(cab,fileName,false);
 			
-			
-			if (!f.exists()){
-				if(fPost.exists()) {
-					fPost.delete();
-				}
-				if(fPatch.exists()) {
-					fPatch.delete();
-				}
-				writeArchive(cab,fileName,true);
+			if (!fArch.exists()){
+				writeArchive(cab,fileNameArch,true);
 
 			} else {
 				int option = JOptionPane.showConfirmDialog(null, "Attention :"+fileName+" existe déjà... Voulez-vous l'écraser ?","Warning",JOptionPane.YES_NO_OPTION);
 				if(option == 0){
-					if(fPost.exists()) {
-						fPost.delete();
-					}
-
-					writeArchive(cab,fileName,true);
+					writeArchive(cab,fileNameArch,true);
 				}
 			}
 		}
@@ -620,6 +727,7 @@ public class SimplyFact extends JFrame {
 				if(option == 0){
 					clearList();
 					cab.patients.clear();
+					cab.setModified(true);
 					refreshData(null);
 				}
 
@@ -635,6 +743,7 @@ public class SimplyFact extends JFrame {
 			if(option == 0){
 				clearList();
 				cab.patients.clear();
+				cab.setModified(true);
 				refreshData(null);
 			}
 
@@ -687,13 +796,13 @@ public class SimplyFact extends JFrame {
 			String annee=sdfA.format(crtDate);
 			ArrayList<Patient> patList=new ArrayList<Patient>();
 			for(int i=0;i<cab.patients.size();i++){
-				if(cab.patients.get(i).hasActe(mois,annee)){
+				if(cab.patients.get(i).hasActe(mois,annee,crtSoignant)){
 					patList.add(cab.patients.get(i));
 				}
 			}
 			if (patList.size()>0) {
 				PdfWrite doc=new PdfWrite();
-				doc.exportPatListPdf(patList,mois,annee);
+				doc.exportPatListPdf(patList,mois,annee,crtSoignant);
 			} else {
 				JOptionPane.showMessageDialog(null, "Erreur : aucun acte pour le mois de "+mois+"/"+annee,"Erreur",JOptionPane.ERROR_MESSAGE);
 			}
@@ -701,7 +810,7 @@ public class SimplyFact extends JFrame {
 	}	
 	class ExpXlsBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
-			cab.writeCsv();
+			cab.writeCsv(crtDate);
 
 		}
 	}	
@@ -710,7 +819,9 @@ public class SimplyFact extends JFrame {
 			//System.out.println("taille liste :"+tableau.getRowCount());
 			cab.importCsv();
 			refreshList();
+			cab.setModified(true);
 			refreshData(null);
+			refreshSoignant();
 
 		}
 	}	
@@ -741,9 +852,15 @@ public class SimplyFact extends JFrame {
 						pat=cabTmp.patients.get(i);
 						cab.addPatient(pat);
 					}
+					String soignant;
+					for (int i=0;i<cabTmp.soignants.size();i++){
+						soignant=cabTmp.soignants.get(i);
+						cab.addSoignant(soignant);
+					}
 					cab.setVersion(cabTmp.getVersion());
 					cab.setModified(true);
 					refreshList();
+					refreshSoignant();
 				}
 			}
 		}
@@ -774,6 +891,42 @@ public class SimplyFact extends JFrame {
 
 		}
 	}	
+	class AddSoignantListener  implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			JOptionPane d = new JOptionPane();
+			String newSoignant = d.showInputDialog(null,"Prenom Nom du nouveau soignant :","Ajouter un nouveau soignant au cabinet",JOptionPane.OK_CANCEL_OPTION);
+			//System.out.println("nouveau soignant :"+newSoignant );
+			if(newSoignant!=null){
+					String[] str=newSoignant.split(" ");
+					String newSoignantMod=Patient.capitalize(newSoignant);
+					
+					if (str.length>1){
+						String nom=str[str.length-1].toUpperCase();
+						String prenom=Patient.capitalize(str[0]);
+						for (int i=1;i<str.length-1;i++){
+							prenom=prenom+"-"+Patient.capitalize(str[i]);
+						}
+						newSoignantMod=prenom+" "+nom;
+					} 
+					cab.addSoignant(newSoignantMod);
+					refreshSoignant();
+					cab.setModified(true);
+				
+			}
+		}
+	}	
+	class DelSoignantListener  implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			if(cab.getCrtSoignant()>=0){
+				cab.delCrtSoignant();
+				cab.setModified(true);
+				
+				refreshSoignant();
+				
+			}
+		}
+	}	
+
 	class CalBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			//System.out.println("taille liste :"+tableau.getRowCount());
@@ -809,7 +962,7 @@ public class SimplyFact extends JFrame {
 		String[] noms = f.list(); 
 		List<String> sortedFiles =new ArrayList<String>();
 		for (int i = 0; noms != null && i < noms.length; i++) {
-			if(noms[i].contains("archive_")) {
+			if(noms[i].contains("archive")) {
 				sortedFiles.add(noms[i]);
 			}
 		}
@@ -826,7 +979,14 @@ public class SimplyFact extends JFrame {
 			synchronize(fileName);
 			nbPatSelected=0;
 			Date date=new Date();
-			fileName="archive_";
+
+			
+			File dir=new File("Archives");
+			if (!dir.exists()){
+				dir.mkdir();
+			}
+			
+			fileName="Archives\\archive_";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			fileName=fileName+sdf.format(date)+".avantModif.fdb";
 			f = new File(fileName); 
@@ -836,12 +996,20 @@ public class SimplyFact extends JFrame {
 			}
 			//System.out.println(cab);
 			refreshList();
+			System.out.println("Soignant selectionné :"+cab.getCrtSoignant());
+
+			refreshSoignant();
 			//updateListSelection();
 		}
 
 	}
 	public void synchronize(String fileName){
 //		mise a jour db pour version 1.2
+		File dir=new File("Archives");
+		if (!dir.exists()){
+			dir.mkdir();
+		}
+
 		if (cab.getVersion()==1.1){
 			cab.setVersion(1.2);
 			try {
@@ -862,11 +1030,16 @@ public class SimplyFact extends JFrame {
 				cabTmp=null;
 			}
 			
+			
+			
 			Date date=new Date();
-			String fileNameOut="archive_";
+			String fileNameOut="Archives\\archive_";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			fileNameOut=fileNameOut+sdf.format(date)+".patched.fdb";
 			writeArchive(cab,fileNameOut,false);
+			File f=new File("archive_crt.fdb");
+			if (f.exists()){f.delete();}
+			writeArchive(cab,"archive_crt.fdb",false);
 			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement");
 			
 		}
@@ -874,6 +1047,61 @@ public class SimplyFact extends JFrame {
 		UidSyncPath UID=new UidSyncPath();
 		System.out.println("Sync path of this machine ("+UID.getUID()+"): "+path);
 		
+		if (cab.getVersion()==1.2){
+			cab.setVersion(1.3);
+
+			
+			File f = new File("."); 
+			System.out.println("Fichiers : " ); 
+			String[] noms = f.list(); 
+			List<String> sortedFiles =new ArrayList<String>();
+			for (int i = 0; noms != null && i < noms.length; i++) {
+				if(noms[i].contains("archive_")) {
+					sortedFiles.add(noms[i]);
+				}
+			}
+			for(int i=0;i<sortedFiles.size();i++) {
+				File fToMove=new File(sortedFiles.get(i));
+				File fToMoveTo=new File("Archives\\"+sortedFiles.get(i));
+				System.out.println("Moving :"+sortedFiles.get(i));
+				fToMove.renameTo(fToMoveTo);
+			}
+
+
+			Cabinet cabTmp=new Cabinet();
+			Patient patTmp;
+			for (int i=0;i<cab.patients.size();i++){
+				patTmp=cab.patients.get(i);
+				patTmp.setPrenom(cab.patients.get(i).getPrenom());
+				patTmp.setNom(cab.patients.get(i).getNom());
+				cabTmp.addPatient(patTmp);
+				//System.out.println("adding patient :"+patTmp);
+			}
+			cabTmp.setVersion(1.3);
+			cabTmp.setModified(true);
+
+			cab=cabTmp;
+			cab.addSyncPath("");
+			cab.addSoignant("Isabelle TREDILLE");
+			cab.addSoignant("Mélissa THEVENIAU");
+			cab.setCrtSoignant(0);
+			cabTmp=null;
+
+
+			Date date=new Date();
+			String fileNameOut="Archives\\archive_";
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			fileNameOut=fileNameOut+sdf.format(date)+".patched.fdb";
+			writeArchive(cab,fileNameOut,false);
+			
+			
+			
+			File fPatch=new File("archive_crt.fdb");
+			if (fPatch.exists()){fPatch.delete();}
+			writeArchive(cab,"archive_crt.fdb",false);
+			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement (-> v1.3)");
+			
+		}
 		
 		
 	}
@@ -913,6 +1141,30 @@ public class SimplyFact extends JFrame {
 		}
 		System.out.println("import "+tableau.getRowCount()+" lignes");
 		updateListSelection();
+		
+	}
+	public void refreshSoignant(){
+		int prevSelSgt=cab.getCrtSoignant();
+
+		soignantCB.removeAllItems();
+		for(int i=0;i<cab.soignants.size();i++){
+			soignantCB.addItem(cab.soignants.get(i).toString());
+		}
+		
+		cab.setCrtSoignant(prevSelSgt);
+		if (cab.getCrtSoignant()>=0){
+			soignantCB.setSelectedIndex(cab.getCrtSoignant());
+		}
+		this.crtSoignant=cab.soignants.get(cab.getCrtSoignant()).toString();
+		disableControlsOnSoignant();
+	}
+	public void disableControlsOnSoignant(){
+		if (this.crtSoignant.equals("Tous")){
+			tableau.setEnabled(false);
+		} else {
+			tableau.setEnabled(true);
+		}
+		
 	}
 	public void clearList(){
 		//System.out.println("taille liste :"+tableau.getRowCount());
@@ -932,13 +1184,18 @@ public class SimplyFact extends JFrame {
 			tableau.setValueAt(false, k, 2);
 			pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(k, 1).toString()));
 			if (pat.isSelected()){
-				pat.removeActe(crtDate);
+				if (cab.getCrtSoignant()>=0){
+					pat.removeActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+				} else {
+					pat.removeActe(crtDate);
+				}
 				pat.deselect();
 				pat.setVisible(false);
 			}
 
 
 		}
+		cab.setModified(true);
 		refreshData(null);
 
 	}
@@ -950,13 +1207,18 @@ public class SimplyFact extends JFrame {
 			tableau.setValueAt(false, k, 2);
 			pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(k, 1).toString()));
 			if (!pat.hasActe()){
-				pat.removeActe(crtDate);
+				if (cab.getCrtSoignant()>=0){
+					pat.removeActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+				} else {
+					pat.removeActe(crtDate);
+				}
 				pat.deselect();
 				pat.setVisible(false);
 			}
 
 
 		}
+		cab.setModified(true);
 		refreshData(null);
 
 	}
@@ -975,14 +1237,27 @@ public class SimplyFact extends JFrame {
 			}
 			idx=cab.getPatientIdx(patSearch);
 			pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(i, 1).toString()));
-			if (pat.hasActe(crtDate)){
-				nbPatSelected++;
-				tableau.setValueAt(true, i, 2);
-				pat.select();
+			if (cab.crtSoignant>=0){
+				String soignant=cab.soignants.get(cab.crtSoignant);
+				if (pat.hasActe(crtDate,soignant)){
+					nbPatSelected++;
+					tableau.setValueAt(true, i, 2);
+					pat.select();
 
+				} else {
+					tableau.setValueAt(false, i, 2);
+					pat.deselect();
+				}
 			} else {
-				tableau.setValueAt(false, i, 2);
-				pat.deselect();
+				if (pat.hasActe(crtDate)){
+					nbPatSelected++;
+					tableau.setValueAt(true, i, 2);
+					pat.select();
+
+				} else {
+					tableau.setValueAt(false, i, 2);
+					pat.deselect();
+				}
 			}
 			
 		}
@@ -994,11 +1269,11 @@ public class SimplyFact extends JFrame {
 		SimpleDateFormat sdfA = new SimpleDateFormat("yyyy");
 		String mois=sdfM.format(crtDate);
 		String annee=sdfA.format(crtDate);
-		cab.setModified(true);
+		
 		tableau.setValueAt("Nb Patients Sélectionnés : "+nbPatSelected+"/"+cab.getSize(), 0, 1);
 		if (fp!=null) {
-
-			fp.setFichePatInfo(pat, mois, annee);
+			crtPat=pat;
+			fp.setFichePatInfo(pat, mois, annee, crtSoignant);
 		}
 	}
 
@@ -1087,6 +1362,26 @@ public class SimplyFact extends JFrame {
 		}
 
 	}
+	
+	public void assignActesToCrtSoignant(){
+		if (cab.getCrtSoignant()<0) {
+			JOptionPane.showMessageDialog(null, "Pas de soignant défini","Erreur",JOptionPane.ERROR_MESSAGE);
+		} else {
+			int confirm = JOptionPane.showOptionDialog(null, "Voulez-vous assigner tous les actes de la base de données a "+soignantCB.getSelectedItem().toString()+" ?", "Assignement Actes", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			if (confirm == 0) {
+				for (int i=0;i<cab.patients.size();i++){
+					Patient pat=cab.patients.get(i);
+					for(int j=0;j<pat.getActe().size();j++){
+						Acte act=pat.getActe().get(j);
+						act.setSoignant(soignantCB.getSelectedItem().toString());
+						System.out.println(act);
+					}
+				}
+				cab.setModified(true);
+			}
+		}
+	}
+	
 	public static void test(){	
 		Cotation[] cot =new Cotation[3];
 		cot[0] =new Cotation(1,TypeActe.AMI,1.5,0.5,TypeActe.AMI,1);

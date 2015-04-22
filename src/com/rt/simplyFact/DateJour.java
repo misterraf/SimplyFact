@@ -58,6 +58,10 @@ public class DateJour implements Serializable{
 		this.date=date;
 		this.jour=jour;
 	}
+	public DateJour(Date date){
+		this.date=date;
+		jour=Jour.matin;
+	}
 	public DateJour(String d){
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try {

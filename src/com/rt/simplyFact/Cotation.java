@@ -44,6 +44,26 @@ public class Cotation implements Serializable{
 		comment="";
 		
 	}
+	public Cotation(String cotStr){
+		k1_1=1;
+		k1_2=1;
+		k2_1=0;
+		k2_2=0;
+		k3_1=0;
+		k3_2=0;
+		mau=false;
+		ifd=false;
+		majDim=false;
+		majNuit=false;
+		typeActe1=TypeActe.AMI;
+		typeActe2=TypeActe.aucun;
+		typeActe3=TypeActe.aucun;
+		deplacement=0;
+		cotation=this.setCotStr();
+		totalCotation=this.setCotation();
+		comment="";
+		
+	}
 	private double setCotation(){
 		double total=0d;
 		switch (typeActe1){

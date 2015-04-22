@@ -35,14 +35,15 @@ public class PdfWrite {
   		
   	}
 		
-  	public  void exportPdf(Patient pat,String mois,String annee,String sgt) {
-		String fileName="Facturation\\facturation_"+pat.getNom();
+  	public  void exportPdf(Patient pat,String mois,String annee,String soignant) {
+		String fileName="Facturation\\facturation_";
+		fileName=fileName+"_"+soignant.replace(" ", "_")+pat.getNom();
+		
 		File f =new File("Facturation");
 		if (!f.exists()){
 			f.mkdir();
 		}
 		if (!pat.getPrenom().equals("")) {fileName=fileName+"_"+pat.getPrenom();}
-		
 		fileName=fileName+"_"+annee+mois+".pdf";
   	
 	     	try {
@@ -51,14 +52,16 @@ public class PdfWrite {
 			String subject="Pour le mois de "+mois+"/"+annee;
 			String title="Facturation pour "+pat.getNom();
 			if (!pat.getPrenom().equals("")) {title=title+" "+pat.getPrenom();}
+			title=title+" par "+soignant.replace(" ", "_");
 	       		document.open();
-   			document.addTitle(title);
+	       		document.addTitle(title);
     			document.addSubject(subject);
     			document.addKeywords("Facturation,Vital'Fact");
     			document.addAuthor("SimplyFact");
-   			document.addCreator("SimplyFact");
-   			addPage(document,pat,mois,annee,sgt);
+    			document.addCreator("SimplyFact");
+    			addPage(document,pat,mois,annee,soignant);
 	       		document.close();
+	       		JOptionPane.showMessageDialog(null, fileName+" exporté avec succès");
 	     	} catch (Exception e) {
 	       			e.printStackTrace();
 	       			JOptionPane.showMessageDialog(null, e.toString(),"Erreur",JOptionPane.ERROR_MESSAGE);
@@ -100,13 +103,12 @@ public class PdfWrite {
 			JOptionPane.showMessageDialog(null, e.toString(),"Erreur",JOptionPane.ERROR_MESSAGE);
 		}
   	}
-  	public  void exportPatListPdf(ArrayList<Patient> patList,String mois,String annee) {
+  	public  void exportPatListPdf(ArrayList<Patient> patList,String mois,String annee,String soignant) {
 		File f =new File("Facturation");
 		if (!f.exists()){
 			f.mkdir();
 		}
-  		String fileName="Facturation\\facturation_"+annee+"_"+mois+".pdf";
-  		
+  		String fileName="Facturation\\facturation_"+soignant.replace(" ", "_")+"_"+annee+"_"+mois+".pdf";
   		try {
   			Document document = new Document();
   			PdfWriter.getInstance(document, new FileOutputStream(fileName));
@@ -120,7 +122,7 @@ public class PdfWrite {
   			document.addCreator("SimplyFact");
   			for (int i=0;i<patList.size();i++) {
   				document.newPage();
-  				addPage(document,patList.get(i),mois,annee);
+  				addPage(document,patList.get(i),mois,annee,soignant);
   			}
   			document.close();
   			JOptionPane.showMessageDialog(null, "Facturation du mois de "+mois+"/"+annee+" ("+patList.size()+" fiche(s) ) "+fileName+" exportée avec succès");

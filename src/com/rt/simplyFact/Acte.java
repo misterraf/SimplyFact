@@ -8,36 +8,45 @@ public class Acte implements Serializable {
 	protected DateJour dateJour;
 	protected Cotation cotation;
 	protected String soignant;
+	protected int order;
 
-	
-	
+
+
 	public Acte(){
 		cotation=new Cotation();
 		dateJour=new DateJour();
 		soignant="";
+		order=0;
 	}
 	public Acte(Cotation cot){
 		cotation=cot;
 		dateJour=new DateJour();
 		soignant="";
+		order=0;
 	}
 	public Acte(DateJour dj){
 		cotation=new Cotation();
 		dateJour=dj;
 		soignant="";
+		order=0;
 	}
 	public Acte(Cotation cot,DateJour dj){
 		cotation=cot;
 		dateJour=dj;
 		soignant="";
+		order=0;
 	}
 	public Acte(Cotation cot,DateJour dj,String sgt){
 		cotation=cot;
 		dateJour=dj;
 		soignant=sgt;
+		order=0;
 	}
 	public void setDateJour(DateJour j){
 		dateJour=j;
+	}
+	public void setOrder(int order){
+		this.order=order;
 	}
 	public DateJour getDateJour(){
 		return dateJour;
@@ -47,6 +56,9 @@ public class Acte implements Serializable {
 	}
 	public Cotation getCotation(){
 		return cotation;
+	}
+	public int getOrder(){
+		return this.order;
 	}
 	public String toString (){
 		String str=cotation+" le "+dateJour;

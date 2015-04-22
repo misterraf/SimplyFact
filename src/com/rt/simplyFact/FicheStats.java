@@ -176,13 +176,15 @@ public class FicheStats extends JFrame{
 	public void  setFicheStatsInfo(Cabinet cab){
 		this.cab=cab;
 		fillData();
+	
 	}
 	public double round2d(double x){
 		return ((int)(x*100+0.5))/100.00;
 	}
 	public void fillData(){
 		Date datei=new Date();
-
+		String crtSoignant=cab.soignants.get(cab.getCrtSoignant());
+		this.setTitle("Statistiques pour "+crtSoignant);
 
 		int randomNum;
 		double randomNumD;
@@ -194,9 +196,9 @@ public class FicheStats extends JFrame{
 			try {
 				datei=sdf.parse("01/"+String.valueOf(i+1)+"/"+annee);
 				//System.out.println("FS date :"+"01/"+String.valueOf(i+1)+"/"+annee);
-				nbActesAnnee[i]=cab.getNbActesMois(datei);
+				nbActesAnnee[i]=cab.getNbActesMois(datei,crtSoignant);
 				//System.out.println("nbactes :"+nbActesAnnee[i]);
-				factAnnee[i]=round2d(cab.getFactMois(datei));
+				factAnnee[i]=round2d(cab.getFactMois(datei,crtSoignant));
 			} catch (ParseException e) {
 				e.printStackTrace();
 				System.out.println("FS can't convert date :"+String.valueOf(i)+"/"+mois+"/"+annee);
@@ -209,8 +211,8 @@ public class FicheStats extends JFrame{
 			factMois[i]=randomNumD;
 			try {
 				datei=sdf.parse(String.valueOf(i+1)+"/"+mois+"/"+annee2);
-				nbActesMois[i]=cab.getNbActesJour(datei);
-				factMois[i]=round2d(cab.getFactJour(datei));
+				nbActesMois[i]=cab.getNbActesJour(datei,crtSoignant);
+				factMois[i]=round2d(cab.getFactJour(datei,crtSoignant));
 			} catch (ParseException e) {
 				e.printStackTrace();
 				System.out.println("FS can't convert date :"+String.valueOf(i)+"/"+mois+"/"+annee2);

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 
 public class Patient implements Serializable{
 	/**
@@ -86,6 +88,46 @@ public class Patient implements Serializable{
 		
 		this.sortDefCot();
 	}
+	public void addActe(Date date,String soignant){
+		
+		String otherSoignant=this.hasOtherActe(date, soignant);
+		int confirm=0;
+		if (!otherSoignant.equals("")){
+			//confirm = JOptionPane.showOptionDialog(null, "Cet acte a déja été assigné a "+otherSoignant+". Voulez-vous le réassigner à "+soignant+" ? sinon garder les deux", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		} 
+		if ((confirm==0)||(confirm==1)){
+			if (confirm==0) {
+				this.removeActe(date);
+			} else {
+				this.removeActe(date,soignant);
+			}
+			
+			if (!this.defCotMatin.toString().equals("")) {
+				DateJour dj=new DateJour(date,Jour.matin);
+				Acte act=new Acte(defCotMatin,dj,soignant);
+				facturation.add(act);
+				this.addCotation(defCotMatin);
+				//System.out.println("ajout cotation : "+defCotMatin);
+			}
+			if (!this.defCotMidi.toString().equals("")) {
+				DateJour dj=new DateJour(date,Jour.midi);
+				Acte act=new Acte(defCotMidi,dj,soignant);
+				facturation.add(act);
+				this.addCotation(defCotMidi);
+				//System.out.println("ajout cotation : "+defCotMidi);
+			}
+			if (!this.defCotSoir.toString().equals("")) {
+				DateJour dj=new DateJour(date,Jour.soir);
+				Acte act=new Acte(defCotSoir,dj,soignant);
+				facturation.add(act);
+				this.addCotation(defCotSoir);
+				//System.out.println("ajout cotation : "+defCotSoir);
+			}
+
+
+			this.sortDefCot();
+		}
+	}
 	public void setAdresse(String adresse){
 		this.adresse=adresse;
 	}
@@ -103,10 +145,10 @@ public class Patient implements Serializable{
 	}
 	
 	public void setNom(String nom){
-		this.nom=nom.toUpperCase();
+		this.nom=nom.toUpperCase().trim();
 	}
 	public void setPrenom(String prenom){
-		this.prenom=formatPrenom(prenom);
+		this.prenom=formatPrenom(prenom).trim();
 	}
 	
 	public String formatPrenom(String prenom){
@@ -133,7 +175,7 @@ public class Patient implements Serializable{
 		}
 		return rtnStr;
 	}
-	public String capitalize(String nom){
+	public static String capitalize(String nom){
 		String str="";
 		if (!nom.equals("")){
 			str=nom.substring(0,1).toUpperCase();
@@ -181,6 +223,18 @@ public class Patient implements Serializable{
 	
 	public void removeActe(Acte act){
 		this.facturation.remove(act);
+	}	
+	public void removeActe(Date date,String soignant){
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
+		for (int i=0;i<this.facturation.size();i++){
+			Acte act=this.facturation.get(i);
+			if ((sdf.format(act.dateJour.getDate()).equals(sdf.format(date)))&&(act.getSoignant().equals(soignant))){
+				this.facturation.remove(i--);
+				
+			}
+		}
+		
+		
 	}	
 	public void removeActe(Date date){
 		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
@@ -250,7 +304,25 @@ public class Patient implements Serializable{
 		return factDate;
 		
 	}	
-	public int getNbActesJour(Date date){
+	public List<Acte> getActe(Date crtDate,String soig){
+		SimpleDateFormat sdfM = new SimpleDateFormat("MM");
+		SimpleDateFormat sdfA = new SimpleDateFormat("yyyy");
+		SimpleDateFormat sdfJ = new SimpleDateFormat("dd");
+		String mois=sdfM.format(crtDate);
+		String annee=sdfA.format(crtDate);
+		String jour=sdfJ.format(crtDate);
+		List<Acte> factDate=new ArrayList<Acte>();
+		for(int i=0;i<this.facturation.size();i++){
+			Acte act=this.facturation.get(i);
+			DateJour dja=act.getDateJour();
+
+			if ((act.getSoignant().equals(soig))&&(dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
+				factDate.add(act);			}
+		}
+		return factDate;
+
+	}	
+	public int getNbActesJour(Date date,String soignant){
 		int nbActes=0;
 		SimpleDateFormat sdfM=new SimpleDateFormat("MM");
 		SimpleDateFormat sdfA=new SimpleDateFormat("yyyy");
@@ -261,16 +333,18 @@ public class Patient implements Serializable{
 		List<Acte> factDate=new ArrayList<Acte>();
 		for(int i=0;i<this.facturation.size();i++){
 			Acte act=this.facturation.get(i);
-			DateJour dja=act.getDateJour();
-			
-			if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
-				nbActes++;
+			if (act.getSoignant().equals(soignant)){
+				DateJour dja=act.getDateJour();
+
+				if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
+					nbActes++;
+				}
 			}
 		}
 		return nbActes;
 		
 	}	
-	public int getNbActesMois(Date date){
+	public int getNbActesMois(Date date,String soignant){
 		int nbActes=0;
 		SimpleDateFormat sdfM=new SimpleDateFormat("MM");
 		SimpleDateFormat sdfA=new SimpleDateFormat("yyyy");
@@ -281,16 +355,18 @@ public class Patient implements Serializable{
 		List<Acte> factDate=new ArrayList<Acte>();
 		for(int i=0;i<this.facturation.size();i++){
 			Acte act=this.facturation.get(i);
-			DateJour dja=act.getDateJour();
-			
-			if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))){
-				nbActes++;
+			if (act.getSoignant().equals(soignant)){
+				DateJour dja=act.getDateJour();
+
+				if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))){
+					nbActes++;
+				}
 			}
 		}
 		return nbActes;
 		
 	}	
-	public double getFactJour(Date date){
+	public double getFactJour(Date date,String soignant){
 		double fact=0;
 		SimpleDateFormat sdfM=new SimpleDateFormat("MM");
 		SimpleDateFormat sdfA=new SimpleDateFormat("yyyy");
@@ -301,16 +377,18 @@ public class Patient implements Serializable{
 		List<Acte> factDate=new ArrayList<Acte>();
 		for(int i=0;i<this.facturation.size();i++){
 			Acte act=this.facturation.get(i);
-			DateJour dja=act.getDateJour();
-			
-			if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
-				fact=fact+act.getCotation().getCotation();
+			if (act.getSoignant().equals(soignant)){
+				DateJour dja=act.getDateJour();
+
+				if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
+					fact=fact+act.getCotation().getCotation();
+				}
 			}
 		}
 		return fact;
 		
 	}	
-	public double getFactMois(Date date){
+	public double getFactMois(Date date, String soignant){
 		double fact=0;
 		SimpleDateFormat sdfM=new SimpleDateFormat("MM");
 		SimpleDateFormat sdfA=new SimpleDateFormat("yyyy");
@@ -321,10 +399,12 @@ public class Patient implements Serializable{
 		List<Acte> factDate=new ArrayList<Acte>();
 		for(int i=0;i<this.facturation.size();i++){
 			Acte act=this.facturation.get(i);
-			DateJour dja=act.getDateJour();
-			
-			if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))){
-				fact=fact+act.getCotation().getCotation();
+			if (act.getSoignant().equals(soignant)){
+				DateJour dja=act.getDateJour();
+
+				if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))){
+					fact=fact+act.getCotation().getCotation();
+				}
 			}
 		}
 		return fact;
@@ -342,9 +422,33 @@ public class Patient implements Serializable{
 		for(int i=0;i<this.facturation.size();i++){
 			if (sdf.format(this.facturation.get(i).dateJour.getDate()).equals(sdf.format(d))){
 				nbActes++;
+				break;
 			}
 		}
 		if (nbActes>0){return true;} else {return false;}
+		
+	}	
+	public boolean hasActe(Date d,String soignant){
+		int nbActes=0;
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
+		for(int i=0;i<this.facturation.size();i++){
+			if ((sdf.format(this.facturation.get(i).dateJour.getDate()).equals(sdf.format(d)))&&(this.facturation.get(i).getSoignant().equals(soignant))){
+				nbActes++;
+				break;
+			}
+		}
+		if (nbActes>0){return true;} else {return false;}		
+	}	
+	public String hasOtherActe(Date d,String soignant){
+		String otherSoignant="";
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
+		for(int i=0;i<this.facturation.size();i++){
+			if ((sdf.format(this.facturation.get(i).dateJour.getDate()).equals(sdf.format(d)))&&(!this.facturation.get(i).getSoignant().equals(soignant))){
+				otherSoignant=this.facturation.get(i).getSoignant();
+				break;
+			}
+		}
+		return otherSoignant;
 		
 	}	
 	public boolean hasActe(Acte act){
@@ -361,6 +465,17 @@ public class Patient implements Serializable{
 		int nbActes=0;
 		for(int i=0;i<this.facturation.size();i++){
 			if ((this.facturation.get(i).dateJour.getDateMois().equals(mois))&&(this.facturation.get(i).dateJour.getDateAnnee().equals(annee))){
+				nbActes++;
+				
+			}
+		}
+		if (nbActes>0){return true;} else {return false;}
+		
+	}
+	public boolean hasActe(String mois, String annee,String soignant){
+		int nbActes=0;
+		for(int i=0;i<this.facturation.size();i++){
+			if ((this.facturation.get(i).dateJour.getDateMois().equals(mois))&&(this.facturation.get(i).dateJour.getDateAnnee().equals(annee))&&(this.facturation.get(i).getSoignant().equals(soignant))){
 				nbActes++;
 				
 			}
@@ -793,12 +908,12 @@ public class Patient implements Serializable{
 		if (nom == null) {
 			if (other.nom != null)
 				return false;
-		} else if (!nom.equals(other.nom))
+		} else if (!nom.trim().equals(other.nom.trim()))
 			return false;
 		if (prenom == null) {
 			if (other.prenom != null)
 				return false;
-		} else if (!prenom.equals(other.prenom))
+		} else if (!prenom.trim().equals(other.prenom.trim()))
 			return false;
 		return true;
 	}

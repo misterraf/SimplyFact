@@ -61,12 +61,34 @@ V1.2.3 :
 
 TBD :
 -----
+- GUI pour gerer l'ordre des patients dans les listes exportées
+- DONE : ajout crtSoignant dans cab, order dans Acte. MAJ db ==> v1.3
+- DONE : attention : export liste avec patient selectionné mais qui n'a pas de cotation par defaut... check avant export liste
+- import listes.txt
+  - gerer conflit quand patient hasacte(dateJour)
+  - convertir str en cot 
+- DONE : export de listes .csv / txt avec soignant
+- DONE : export pdf selon soignant
+- ajouter "Tous" a liste soignants par defaut
+- si crtSoignant=="Tous" : 
+	- CANCELLED : modifier fichepat 
+	- DONE : tableau.setEnabled(false)
+	- modifier ficheStats pour refleter l'activite de tous les soignants
+	- DONE : l'ajout d'actes devient disabled 
+	- export PDF disabled 
+	- import liste disabled
+	- save db : error message (switch to valid user)
+	- menus disabled
+	- only stats button (+/- save db) enabled
+
+- DONE : fiche patient ne montre que les actes du soignant courant
+- DONE : trim / format nom soignants
 - synchronisation db avec disque cloud
-- deplacer archives dans .\Archives\
+- DONE : deplacer archives dans .\Archives\
 - trim espaces redondants dans nom, prenom
-- ajout specification soignant...
+- DONE : ajout specification soignant
 - 3 colonnes a cocher pour matin midi et soir au lieu de 1 seule pour les 3.
-- si une date est specifiee dans import csv, ajout actes par defaut a la date donnÃ©e...
+- si une date est specifiee dans import csv, ajout actes par defaut a la date donnée...
 - writeCsv (inclure tous les champs)
 	--> passer la date courante en parametre
 	--> export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
@@ -83,8 +105,9 @@ TBD :
 - jdialog pour chaque stacktrace
 - fichiers exportes : lesquels demander si ecraser ?
 - scan / view pdf a partir de fichpat ?
-- augmenter taille listes cotations / diminuer taille liste actes dans fichepat
+- DONE / CANCELLED : augmenter taille listes cotations / diminuer taille liste actes dans fichepat
 
+- afficher un tick grisé quand l'acte existe pour un autre soignant que le soignant courant : buttonrenderer different
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 
@@ -92,6 +115,10 @@ Bugs :
 ------
 essayer importCsv avec un patient sans cotation
 si importCsv plante : gestion exception
+DONE : ajout soignant : si cancel => exception
+DONE : ajout soignant si pas cancel, stack trace si combochange 
+stack trace si on efface le dernier soignant
+DONE : essayer Simply fact vierge, sans liste ni soignant defini
 
 Nouvelles features :
 --------------------
@@ -100,15 +127,16 @@ export listes:
 - en mode "tous soignants", desactiver edition de liste
 
 import liste:
-- demander import pour quel soignant (menu deroult)
+- demander import pour quel soignant (menu deroult) : NON : soignant doit etre une balise dans la liste
 - confirmer chaque ajout, avec option oui pour tous. 
 - si ajout existe deja, ne pas demander
 - tolerance sur nom / prenom (desalignement nom patient dans la db entre <> soigants) : s'il nexiste pas, demander creer ou rattacher a patient existant
 - si import d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
 
 ajout acte 
-- si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
+- DONE : si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
 
 
 stats :
-stats par soignant, stats pour le cabinet
+DONE : stats par soignant, 
+stats pour le cabinet
