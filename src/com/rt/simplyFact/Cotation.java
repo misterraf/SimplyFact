@@ -44,7 +44,7 @@ public class Cotation implements Serializable{
 		comment="";
 		
 	}
-	public Cotation(String cotStr){
+		public Cotation(String cotStr){
 		k1_1=1;
 		k1_2=1;
 		k2_1=0;
@@ -59,10 +59,66 @@ public class Cotation implements Serializable{
 		typeActe2=TypeActe.aucun;
 		typeActe3=TypeActe.aucun;
 		deplacement=0;
+		comment="";
+		cotStr=cotStr.replace("+",	"_");
+		String[] cotSpl=cotStr.split("_");
+		int nbAMI=1;
+		for (int i=0;i<cotSpl.length;i++){
+			
+			if((cotSpl[i].contains("AMI"))||(cotSpl[i].contains("AIS"))){
+				TypeActe ta=TypeActe.aucun;
+				double k_1=0;
+				double k_2=0;
+				String item=cotSpl[i];
+				if (cotSpl[i].contains("AMI")){
+					ta=TypeActe.AMI;
+					int idx=item.indexOf("AMI");
+					k_1=Double.parseDouble(cotSpl[i].substring(0, idx));
+					k_2=Double.parseDouble(cotSpl[i].substring(cotSpl[i].indexOf("AMI")+3,cotSpl[i].length()));
+				} else {
+					ta=TypeActe.AIS;
+					int idx=item.indexOf("AIS");
+					k_1=Double.parseDouble(cotSpl[i].substring(0, idx));
+					k_2=Double.parseDouble(cotSpl[i].substring(cotSpl[i].indexOf("AIS")+3,cotSpl[i].length()));
+				}
+				if (nbAMI==1){
+					k1_1=k_1;
+					typeActe1=ta;
+					k1_2=k_2;
+				} else if(nbAMI==2){
+					k2_1=k_1;
+					typeActe2=ta;
+					k2_2=k_2;
+				} else if(nbAMI==3){
+					k3_1=k_1;
+					typeActe3=ta;
+					k3_2=k_2;
+				}
+				nbAMI++;
+			}
+			if (cotSpl[i].contains("MAU")){
+				mau=true;
+			}
+			if (cotSpl[i].contains("MajDim")){
+				majDim=true;
+			}
+			if (cotSpl[i].contains("MajNuit")){
+				majNuit=true;
+			}
+			if (cotSpl[i].contains("IFD")){
+				ifd=true;
+			}
+			if (cotSpl[i].contains("IK")){
+				ifd=true;
+				int k=Integer.parseInt(cotSpl[i].substring(0, cotSpl[i].indexOf("IK")));
+				deplacement=k;
+			}
+			
+			
+		}
 		cotation=this.setCotStr();
 		totalCotation=this.setCotation();
-		comment="";
-		
+
 	}
 	private double setCotation(){
 		double total=0d;
