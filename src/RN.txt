@@ -57,16 +57,18 @@ V1.2.3 :
 - DONE : facturation exportee dans .\Facturation\, listes exportees dans .\Listes\ 
 - DONE : ajout syncPath dans cab, addSyncPath
 
-
+V2.0 :
+------
 
 TBD :
 -----
+
 - GUI pour gerer l'ordre des patients dans les listes exportées
 - DONE : ajout crtSoignant dans cab, order dans Acte. MAJ db ==> v1.3
 - DONE : attention : export liste avec patient selectionné mais qui n'a pas de cotation par defaut... check avant export liste
 - import listes.txt
   - gerer conflit quand patient hasacte(dateJour)
-  - convertir str en cot 
+  - DONE : convertir str en cot 
 - DONE : export de listes .csv / txt avec soignant
 - DONE : export pdf selon soignant
 - ajouter "Tous" a liste soignants par defaut
@@ -141,3 +143,8 @@ ajout acte
 stats :
 DONE : stats par soignant, 
 stats pour le cabinet
+
+
+
+
+
