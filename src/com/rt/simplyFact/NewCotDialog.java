@@ -46,6 +46,7 @@ public class NewCotDialog extends JDialog {
 	private JCheckBox chkMajDim=new JCheckBox("MajDim");
 	private JCheckBox chkMajNuit=new JCheckBox("MajNuit");
 	private JCheckBox chkIFD=new JCheckBox("IFD");
+	private JCheckBox chkMCI=new JCheckBox("MCI");
 	private JTextField k11TF =new JTextField();
 	private JTextField k12TF =new JTextField();
 	private JTextField k21TF =new JTextField();
@@ -136,6 +137,7 @@ public class NewCotDialog extends JDialog {
 		box1.add(k32TF);
 		//box2.add(lbPlus3);
 		box4.add(chkMau);
+		box4.add(chkMCI);
 		box4.add(chkMajDim);
 		box4.add(chkMajNuit);
 		box4.add(chkIFD);
@@ -256,6 +258,7 @@ public class NewCotDialog extends JDialog {
 				cot.settypeActe3((TypeActe)typeActe3CB.getSelectedItem());
 				cot.setComment(commentTF.getText());
 				cot.setMau(chkMau.isSelected());
+				cot.setMci(chkMCI.isSelected());
 				cot.setMajDim(chkMajDim.isSelected());
 				cot.setMajNuit(chkMajNuit.isSelected());
 				cot.setIfd(chkIFD.isSelected());
@@ -272,7 +275,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK11(k);
 				} catch(NumberFormatException e) {
 					k11TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 				try {
@@ -280,7 +283,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK12(k);
 				} catch(NumberFormatException e) {
 					k12TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 				try {
@@ -288,7 +291,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK21(k);
 				} catch(NumberFormatException e) {
 					k21TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 				try {
@@ -296,7 +299,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK22(k);
 				} catch(NumberFormatException e) {
 					k22TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 				try {
@@ -304,7 +307,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK31(k);
 				} catch(NumberFormatException e) {
 					k31TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 				try {
@@ -312,7 +315,7 @@ public class NewCotDialog extends JDialog {
 					cot.setK32(k);
 				} catch(NumberFormatException e) {
 					k32TF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
+					if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques uniquement dans les coefficients de cotation","Erreur",JOptionPane.ERROR_MESSAGE);
 					error=true;
 				}
 					try {
@@ -320,7 +323,7 @@ public class NewCotDialog extends JDialog {
 						cot.setIk(k);
 					} catch(NumberFormatException e) {
 						ikTF.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-						if(!error) JOptionPane.showMessageDialog(null, "Valeurs numériques sans virgule uniquement pour les IK","Erreur",JOptionPane.ERROR_MESSAGE);
+						if(!error) JOptionPane.showMessageDialog(null, "Valeurs numÃ©riques sans virgule uniquement pour les IK","Erreur",JOptionPane.ERROR_MESSAGE);
 						error=true;
 					}
 
@@ -342,6 +345,7 @@ public class NewCotDialog extends JDialog {
 		ikTF.setText(removeDotZero(String.valueOf(cot.getIk())));
 		commentTF.setText(cot.getComment());
 		chkMau.setSelected(cot.getMau());
+		chkMCI.setSelected(cot.getMci());
 		chkMajDim.setSelected(cot.getMajDim());
 		chkMajNuit.setSelected(cot.getMajNuit());
 		chkIFD.setSelected(cot.getIfd());
