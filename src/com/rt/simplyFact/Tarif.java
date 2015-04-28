@@ -12,6 +12,7 @@ public class Tarif implements Serializable{
 	public static  double cotIfd = 2.5f;
 	public static  double cotMajDim = 8.0f;
 	public static  double cotMajNuit = 9.15f; 
+	public static  double cotMci = 5.00f; 
 	public  final String euroChar ="\u20AC";  
 	public Tarif() {
 		cotMau = 1.35f;
@@ -21,6 +22,7 @@ public class Tarif implements Serializable{
 		cotIfd = 2.5f;
 		cotMajDim = 8.0f;
 		cotMajNuit = 9.15f;
+		cotMci = 5.00f;
 	}
 	public static void setCotMau(float v){
 		cotMau=v;
