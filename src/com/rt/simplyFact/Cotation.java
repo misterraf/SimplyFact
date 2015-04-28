@@ -11,7 +11,6 @@ public class Cotation implements Serializable{
 	private boolean mau,ifd,majDim,majNuit,mci;
 	private int deplacement;
 
-
 /*
 	private  double Tarif.cotMau = 1.35f;
 	private  double Tarif.cotAmi = 3.15f;
