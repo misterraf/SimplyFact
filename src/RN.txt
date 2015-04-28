@@ -119,6 +119,7 @@ DONE : ajout soignant : si cancel => exception
 DONE : ajout soignant si pas cancel, stack trace si combochange 
 stack trace si on efface le dernier soignant
 DONE : essayer Simply fact vierge, sans liste ni soignant defini
+import liste avec nouveau user, nouvel user pas affiché
 
 Nouvelles features :
 --------------------
