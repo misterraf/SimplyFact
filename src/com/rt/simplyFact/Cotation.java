@@ -8,7 +8,7 @@ public class Cotation implements Serializable{
 	private String cotation,comment;
 	private double totalCotation,k1_1,k1_2,k2_1,k2_2,k3_1,k3_2;
 	private TypeActe typeActe1,typeActe2,typeActe3;
-	private boolean mau,ifd,majDim,majNuit;
+	private boolean mau,ifd,majDim,majNuit,mci;
 	private int deplacement;
 
 
@@ -20,6 +20,7 @@ public class Cotation implements Serializable{
 	private  double Tarif.cotIfd = 2.5f;
 	private  double Tarif.cotMajDim = 8.0f;
 	private  double Tarif.cotMajNuit = 9.15f; 
+	private  double Tarif.cotMci = 5.00f; 
 	private  final String euroChar ="\u20AC";  
 */
 	
@@ -32,6 +33,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=false;
+		mci=false;
 		ifd=false;
 		majDim=false;
 		majNuit=false;
@@ -44,7 +46,7 @@ public class Cotation implements Serializable{
 		comment="";
 		
 	}
-		public Cotation(String cotStr){
+	public Cotation(String cotStr){
 		k1_1=1;
 		k1_2=1;
 		k2_1=0;
@@ -52,6 +54,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=false;
+		mci=false;
 		ifd=false;
 		majDim=false;
 		majNuit=false;
@@ -98,6 +101,9 @@ public class Cotation implements Serializable{
 			}
 			if (cotSpl[i].contains("MAU")){
 				mau=true;
+			}
+			if (cotSpl[i].contains("MCI")){
+				mci=true;
 			}
 			if (cotSpl[i].contains("MajDim")){
 				majDim=true;
@@ -150,6 +156,7 @@ public class Cotation implements Serializable{
 			total=total+k3_1*Tarif.cotAis*k3_2;
 		}
 		if (mau){total=total+Tarif.cotMau;}
+		if (mci){total=total+Tarif.cotMci;}
 		if (ifd){total=total+Tarif.cotIfd;}
 		if (majDim){total=total+Tarif.cotMajDim;}
 		if (majNuit){total=total+Tarif.cotMajNuit;}
@@ -242,6 +249,7 @@ public class Cotation implements Serializable{
 			}
 		}
 		if (mau){cot=cot+"+MAU";}
+		if (mci){cot=cot+"+MCI";}
 		if (ifd){cot=cot+"+IFD";}
 		if (majDim){cot=cot+"+MajDim";}
 		if (majNuit){cot=cot+"+MajNuit";}
@@ -262,6 +270,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=false;
+		mci=false;
 		ifd=false;
 		majDim=false;
 		majNuit=false;
@@ -281,6 +290,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=false;
+		mci=false;
 		ifd=false;
 		majDim=false;
 		majNuit=false;
@@ -300,6 +310,7 @@ public class Cotation implements Serializable{
 		k3_1=ik31;
 		k3_2=ik32;
 		mau=false;
+		mci=false;
 		ifd=false;
 		majDim=false;
 		majNuit=false;
@@ -311,7 +322,7 @@ public class Cotation implements Serializable{
 		cotation=this.setCotStr();
 		comment="";
 	}
-	public Cotation(double ik11, TypeActe iact1,double ik12, boolean imau,boolean imajDim,boolean iifd,int iik){
+	public Cotation(double ik11, TypeActe iact1,double ik12, boolean imau,boolean imci,boolean imajDim,boolean iifd,int iik){
 		k1_1=ik11;
 		k1_2=ik12;
 		k2_1=0;
@@ -319,6 +330,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=imau;
+		mci=imci;
 		ifd=iifd;
 		majDim=imajDim;
 		majNuit=false;
@@ -330,7 +342,7 @@ public class Cotation implements Serializable{
 		cotation=this.setCotStr();
 		comment="";
 	}
-	public Cotation(double ik11, TypeActe iact1,double ik12, double ik21, TypeActe iact2,double ik22,boolean imau,boolean imajDim,boolean iifd,int iik){
+	public Cotation(double ik11, TypeActe iact1,double ik12, double ik21, TypeActe iact2,double ik22,boolean imau,boolean imci,boolean imajDim,boolean iifd,int iik){
 		k1_1=ik11;
 		k1_2=ik12;
 		k2_1=ik21;
@@ -338,6 +350,7 @@ public class Cotation implements Serializable{
 		k3_1=0;
 		k3_2=0;
 		mau=imau;
+		mci=imci;
 		ifd=iifd;
 		majDim=imajDim;
 		majNuit=false;
@@ -349,7 +362,7 @@ public class Cotation implements Serializable{
 		cotation=this.setCotStr();
 		comment="";
 	}
-	public Cotation(double ik11, TypeActe iact1,double ik12, double ik21, TypeActe iact2,double ik22,double ik31, TypeActe iact3,double ik32,boolean imau,boolean imajDim,boolean iifd,int iik){
+	public Cotation(double ik11, TypeActe iact1,double ik12, double ik21, TypeActe iact2,double ik22,double ik31, TypeActe iact3,double ik32,boolean imau,boolean imci,boolean imajDim,boolean iifd,int iik){
 		k1_1=ik11;
 		k1_2=ik12;
 		k2_1=ik21;
@@ -357,6 +370,7 @@ public class Cotation implements Serializable{
 		k3_1=ik31;
 		k3_2=ik32;
 		mau=imau;
+		mci=imci;
 		ifd=iifd;
 		majDim=imajDim;
 		majNuit=false;
@@ -416,6 +430,11 @@ public class Cotation implements Serializable{
 		cotation=this.setCotStr();
 		totalCotation=this.setCotation();
 	}
+	public void setMci(boolean imci){
+		mci=imci;
+		cotation=this.setCotStr();
+		totalCotation=this.setCotation();
+	}
 	public void setIfd(boolean iifd){
 		ifd=iifd;
 		cotation=this.setCotStr();
@@ -469,6 +488,9 @@ public class Cotation implements Serializable{
 	public boolean getMau(){
 		return mau;
 	}
+	public boolean getMci(){
+		return mci;
+	}
 	public boolean getIfd(){
 		return ifd;
 	}
@@ -491,11 +513,16 @@ public class Cotation implements Serializable{
 		return this.comment;
 	}
 		
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+		result = prime * result
+				+ ((cotation == null) ? 0 : cotation.hashCode());
 		result = prime * result + deplacement;
 		result = prime * result + (ifd ? 1231 : 1237);
 		long temp;
@@ -514,6 +541,9 @@ public class Cotation implements Serializable{
 		result = prime * result + (majDim ? 1231 : 1237);
 		result = prime * result + (majNuit ? 1231 : 1237);
 		result = prime * result + (mau ? 1231 : 1237);
+		result = prime * result + (mci ? 1231 : 1237);
+		temp = Double.doubleToLongBits(totalCotation);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result
 				+ ((typeActe1 == null) ? 0 : typeActe1.hashCode());
 		result = prime * result
@@ -522,6 +552,9 @@ public class Cotation implements Serializable{
 				+ ((typeActe3 == null) ? 0 : typeActe3.hashCode());
 		return result;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -531,10 +564,10 @@ public class Cotation implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		Cotation other = (Cotation) obj;
-		if (comment == null) {
-			if (other.comment != null)
+		if (cotation == null) {
+			if (other.cotation != null)
 				return false;
-		} else if (!comment.equals(other.comment))
+		} else if (!cotation.equals(other.cotation))
 			return false;
 		if (deplacement != other.deplacement)
 			return false;
@@ -563,6 +596,11 @@ public class Cotation implements Serializable{
 		if (majNuit != other.majNuit)
 			return false;
 		if (mau != other.mau)
+			return false;
+		if (mci != other.mci)
+			return false;
+		if (Double.doubleToLongBits(totalCotation) != Double
+				.doubleToLongBits(other.totalCotation))
 			return false;
 		if (typeActe1 != other.typeActe1)
 			return false;
