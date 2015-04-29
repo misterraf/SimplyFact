@@ -1,7 +1,7 @@
 release notes :
 ---------------
-- DONE : ajouter bouton modif cot° a chaque ligne
-- DONE : nombre de lignes selctionnées dans row 0
+- DONE : ajouter bouton modif cotÂ° a chaque ligne
+- DONE : nombre de lignes selctionnÃ©es dans row 0
 - DONE :importCsv
 	--> DONE : file chooser
 	--> DONE : lire les champs comme spec writeCsv
@@ -59,57 +59,87 @@ V1.2.3 :
 
 V2.0 :
 ------
-
-TBD :
------
-
-- GUI pour gerer l'ordre des patients dans les listes export�es
+- DONE : effacer tous les actes de la db.
 - DONE : ajout crtSoignant dans cab, order dans Acte. MAJ db ==> v1.3
-- DONE : attention : export liste avec patient selectionn� mais qui n'a pas de cotation par defaut... check avant export liste
-- import listes.txt
-  - gerer conflit quand patient hasacte(dateJour)
+- DONE : attention : export liste avec patient selectionné mais qui n'a pas de cotation par defaut... check avant export liste
+- DONE : import listes.txt
+  - DONE : gerer conflit quand patient hasacte(dateJour)
   - DONE : convertir str en cot 
 - DONE : export de listes .csv / txt avec soignant
 - DONE : export pdf selon soignant
-- ajouter "Tous" a liste soignants par defaut
-- si crtSoignant=="Tous" : 
+- DONE : si crtSoignant=="Tous" : 
 	- CANCELLED : modifier fichepat 
 	- DONE : tableau.setEnabled(false)
-	- modifier ficheStats pour refleter l'activite de tous les soignants
 	- DONE : l'ajout d'actes devient disabled 
-	- export PDF disabled 
-	- import liste disabled
-	- save db : error message (switch to valid user)
-	- menus disabled
-	- only stats button (+/- save db) enabled
+	- DONE : export PDF disabled 
+	- CANCELLED : save db : error message (switch to valid user)
+	- DONE : menus disabled
+	- DONE : only stats button (+/- save db) enabled
+- DONE : si crtSoignant=="" : 
+	- DONE : tableau.setEnabled(false) (pas de soignant dans la liste)
+	- DONE export PDF disabled 
+	- DONE : import liste disabled
+	- DONE : menus disabled
+	- DONE : stats btn disabled
 
 - DONE : fiche patient ne montre que les actes du soignant courant
 - DONE : trim / format nom soignants
-- synchronisation db avec disque cloud
 - DONE : deplacer archives dans .\Archives\
-- trim espaces redondants dans nom, prenom
+- DONE : trim espaces redondants dans nom, prenom
 - DONE : ajout specification soignant
+- DONE : si une date est specifiee dans import csv, ajout actes par defaut a la date donnée...
+- DONE : writeCsv (inclure tous les champs)
+	--> DONE : passer la date courante en parametre
+	--> CANCELLED : export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
+- DONE : effacer cotations inutilisees (accessible par menu)
+- DONE / CANCELLED : augmenter taille listes cotations / diminuer taille liste actes dans fichepat
+- FIXED : ajout soignant : si cancel => exception
+- FIXED : ajout soignant si pas cancel, stack trace si combochange 
+- FIXED : stack trace si on efface le dernier soignant
+- FIXED : essayer Simply fact vierge, sans liste ni soignant defini
+- FIXED : import liste avec nouveau user, nouvel user pas affiché
+- FIXED : pas possible de modifier la cotation quand nouveau patient sans cotation par defaut.
+- FIXED : si pas de soignant defini, stack trace pour bouton stats
+- DONE : Ajout menu deroulant soigants en haut de la liste ?
+- DONE : en mode "tous soignants", desactiver edition de liste
+- DONE : si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
+- DONE : stats par soignant, 
+
+
+TBD :
+-----
+- definition d'une nouvelle cotation : si pas de cotation par defaut, elle devient la cot par defaut
+- menu utilisateur avec 
+  - ajout nouveau user
+  - effacer utilisateur courant 
+  - reaffecter les actes 
+- effacer les actes d'un utilisateur de la db si l'utilisateur est efface (demander)
+- GUI pour reaffecter les actes : date debut / date fin, from->to (from doit etre different de to)
+- GUI pour gerer l'ordre des patients dans les listes exportées
+- ajouter "Tous" a liste soignants par defaut
+- si crtSoignant=="Tous" : 
+	- modifier ficheStats pour refleter l'activite de tous les soignants
+- synchronisation db avec disque cloud
+- trim espaces redondants dans nom, prenom
 - 3 colonnes a cocher pour matin midi et soir au lieu de 1 seule pour les 3.
-- si une date est specifiee dans import csv, ajout actes par defaut a la date donn�e...
-- writeCsv (inclure tous les champs)
-	--> passer la date courante en parametre
-	--> export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
 - effacer patients inactifs : specifier date
 - runtime avec big db... generateur de db aleatoire ... /
 	-> ne pas prendre en compte patients non visibles 
 	-> affichage stats dynamique ?
 	-> stocker sommes de cotation / nb actes dans cabinet ?
 - majDim auto ?
-- effacer cotations inutilisees (accessible par menu)
 - cotation totale dans PDF ?
 - bouton calendar ? combobox ?
 - dont scroll row(0) ?
 - jdialog pour chaque stacktrace
 - fichiers exportes : lesquels demander si ecraser ?
 - scan / view pdf a partir de fichpat ?
-- DONE / CANCELLED : augmenter taille listes cotations / diminuer taille liste actes dans fichepat
+- confirmer chaque ajout, avec option oui pour tous. 
+- si ajout existe deja, ne pas demander
+- tolerance sur nom / prenom (desalignement nom patient dans la db entre <> soigants) : s'il nexiste pas, demander creer ou rattacher a patient existant
+- si import d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
 
-- afficher un tick gris� quand l'acte existe pour un autre soignant que le soignant courant : buttonrenderer different
+- afficher un tick grisé quand l'acte existe pour un autre soignant que le soignant courant : buttonrenderer different
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 
@@ -117,33 +147,6 @@ Bugs :
 ------
 essayer importCsv avec un patient sans cotation
 si importCsv plante : gestion exception
-DONE : ajout soignant : si cancel => exception
-DONE : ajout soignant si pas cancel, stack trace si combochange 
-stack trace si on efface le dernier soignant
-DONE : essayer Simply fact vierge, sans liste ni soignant defini
-import liste avec nouveau user, nouvel user pas affich�
-
-Nouvelles features :
---------------------
-export listes:
-- Ajout menu deroulant soigants en haut de la liste, et pour les stats (+all) ?
-- en mode "tous soignants", desactiver edition de liste
-
-import liste:
-- demander import pour quel soignant (menu deroult) : NON : soignant doit etre une balise dans la liste
-- confirmer chaque ajout, avec option oui pour tous. 
-- si ajout existe deja, ne pas demander
-- tolerance sur nom / prenom (desalignement nom patient dans la db entre <> soigants) : s'il nexiste pas, demander creer ou rattacher a patient existant
-- si import d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
-
-ajout acte 
-- DONE : si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
-
-
-stats :
-DONE : stats par soignant, 
-stats pour le cabinet
-
 
 
 
