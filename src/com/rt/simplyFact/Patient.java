@@ -112,7 +112,6 @@ public class Patient implements Serializable{
 		String otherSoignant=this.hasOtherActe(date, soignant);
 		int confirm=0;
 		if (!otherSoignant.equals("")){
-			//confirm = JOptionPane.showOptionDialog(null, "Cet acte a déja été assigné a "+otherSoignant+". Voulez-vous le réassigner à "+soignant+" ? sinon garder les deux", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		} 
 		if ((confirm==0)||(confirm==1)){
 			if (confirm==0) {

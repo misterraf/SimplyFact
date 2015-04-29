@@ -39,7 +39,7 @@ public class Cabinet implements Serializable{
 			if (soignants.size()==0) {crtSoignant++;}
 			soignants.add(soignant);
 		} else {
-			JOptionPane.showMessageDialog(null, "Ce nom existe d√©j√†","Erreur",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Ce nom existe dÈj‡†","Erreur",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	public void setCrtSoignant(int crtSoignant){
@@ -282,7 +282,7 @@ public class Cabinet implements Serializable{
 		//Date crtDate=new Date();
 		String test=checkIfNoEmptyDefCot();
 		if(!test.equals("")){
-			int confirm = JOptionPane.showOptionDialog(null, test+" n'ont pas de cotation par d√©faut\n(et ne seront donc pas export√©s dans les listes).\nVoulez-vous exporter la liste ?", "Avertissement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			int confirm = JOptionPane.showOptionDialog(null, test+" n'ont pas de cotation par dÈfaut\n(et ne seront donc pas exportÈs dans les listes).\nVoulez-vous exporter la liste ?", "Avertissement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			if (confirm != 0) {return;}
 
 		}
@@ -412,7 +412,7 @@ public class Cabinet implements Serializable{
 					}
 				}
 			}
-			JOptionPane.showMessageDialog(null, "Liste : "+fileNameTxt+" export√©e avec succ√®s");
+			JOptionPane.showMessageDialog(null, "Liste : "+fileNameTxt+" exportÈe avec succËs");
 
 
 		}	catch (IOException e) {
