@@ -88,12 +88,31 @@ public class Patient implements Serializable{
 		
 		this.sortDefCot();
 	}
+	public void clearAllActes(){
+		facturation.clear();
+	}
+	public void clearUnusedCot(){
+		List<Cotation> usedCot=new ArrayList<Cotation>();
+		for(int i=0;i<facturation.size();i++){
+			Acte act=facturation.get(i);
+			if (!usedCot.contains(act.getCotation())){
+				usedCot.add(act.getCotation());
+			}
+		}
+		for(int i=0;i<this.getCotList().size();i++){
+			Cotation cot=this.getCotList().get(i);
+			if (!usedCot.contains(cot)){
+				System.out.println(this.toString()+" : removing unused cotation : "+cot);
+				this.getCotList().remove(i--);
+			}
+		}
+	}
 	public void addActe(Date date,String soignant){
 		
 		String otherSoignant=this.hasOtherActe(date, soignant);
 		int confirm=0;
 		if (!otherSoignant.equals("")){
-			//confirm = JOptionPane.showOptionDialog(null, "Cet acte a déja été assigné a "+otherSoignant+". Voulez-vous le réassigner à "+soignant+" ? sinon garder les deux", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			//confirm = JOptionPane.showOptionDialog(null, "Cet acte a dÃ©ja Ã©tÃ© assignÃ© a "+otherSoignant+". Voulez-vous le rÃ©assigner Ã  "+soignant+" ? sinon garder les deux", "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		} 
 		if ((confirm==0)||(confirm==1)){
 			if (confirm==0) {
@@ -492,6 +511,13 @@ public class Patient implements Serializable{
 //		return str;
 //		
 //	}
+	public boolean hasDefCot(){
+		boolean result=true;
+		if ((this.getDefCotMatin().toString().equals(""))&&(this.getDefCotMidi().toString().equals(""))&&(this.getDefCotSoir().toString().equals(""))){
+			result=false;
+		}
+		return 	result;	
+	}
 	public Cotation getDefCotMatin(){
 		return 	this.defCotMatin;	
 	}
@@ -873,9 +899,9 @@ public class Patient implements Serializable{
 //	 		}
 //		}
 //		if (this.selected) {
-//			str=str+"est selectionné\n";
+//			str=str+"est selectionnÃ©\n";
 //		} else {
-//			str=str+"n'est pas selectionné\n";
+//			str=str+"n'est pas selectionnÃ©\n";
 //		}
 		return str;
 	}
