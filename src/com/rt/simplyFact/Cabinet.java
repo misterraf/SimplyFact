@@ -39,7 +39,7 @@ public class Cabinet implements Serializable{
 			if (soignants.size()==0) {crtSoignant++;}
 			soignants.add(soignant);
 		} else {
-			JOptionPane.showMessageDialog(null, "Ce nom existe dÈj‡","Erreur",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Ce nom existe d√©j√†","Erreur",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	public void setCrtSoignant(int crtSoignant){
@@ -282,7 +282,7 @@ public class Cabinet implements Serializable{
 		//Date crtDate=new Date();
 		String test=checkIfNoEmptyDefCot();
 		if(!test.equals("")){
-			int confirm = JOptionPane.showOptionDialog(null, test+" n'ont pas de cotation par dÈfaut\n(et ne seront donc pas exportÈs dans les listes).\nVoulez-vous exporter la liste ?", "Avertissement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			int confirm = JOptionPane.showOptionDialog(null, test+" n'ont pas de cotation par d√©faut\n(et ne seront donc pas export√©s dans les listes).\nVoulez-vous exporter la liste ?", "Avertissement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			if (confirm != 0) {return;}
 
 		}
@@ -324,7 +324,7 @@ public class Cabinet implements Serializable{
 				line="\n\"Liste pour :\";"+soignant+"\n";
 				bw.write(line);
 				bwTxt.write(System.getProperty("line.separator")+"Liste pour : "+soignant+System.getProperty("line.separator"));
-				line="Civilite;Nom;Prenom;Adresse;Tel;MMS;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;MAU;MajDim;MajNuit;IFD;IK;commentaire\n";
+				line="Civilite;Nom;Prenom;Adresse;Tel;MMS;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;MAU;MCI;MajDim;MajNuit;IFD;IK;commentaire\n";
 				bw.write(line);
 
 				for (int i=0;i<patients.size();i++) {
@@ -382,6 +382,11 @@ public class Cabinet implements Serializable{
 							} else {
 								line=line+";";
 							}
+							if (crtAct.getCotation().getMci()){
+								line=line+"oui;";
+							} else {
+								line=line+";";
+							}
 							if (crtAct.getCotation().getMajDim()){
 								line=line+"oui;";
 							} else {
@@ -407,7 +412,7 @@ public class Cabinet implements Serializable{
 					}
 				}
 			}
-			JOptionPane.showMessageDialog(null, "Liste : "+fileName+" exportÈe avec succËs");
+			JOptionPane.showMessageDialog(null, "Liste : "+fileNameTxt+" export√©e avec succ√®s");
 
 
 		}	catch (IOException e) {
@@ -462,6 +467,9 @@ public class Cabinet implements Serializable{
 					} else if(line.contains("Liste pour")){
 						String[] lineSpl=line.split(":");
 						soignant=lineSpl[lineSpl.length-1].trim();
+						if(!this.soignants.contains(soignant)){
+							this.addSoignant(soignant);
+						}
 
 					} else if (!line.equals("")){
 
@@ -484,10 +492,10 @@ public class Cabinet implements Serializable{
 						for(int i=1;i<cotIdx;i++){
 							nomStr=nomStr+" "+lineSpl[i];
 						}
-
+					
 						int patIdx=this.getPatientIdx(nomStr);
 						Patient pat=new Patient();
-						if(patIdx<1){
+						if(patIdx<0){
 
 							String nom="";
 							String prenom="";
@@ -516,6 +524,7 @@ public class Cabinet implements Serializable{
 								nom=nameParts[nameParts.length-1];
 							}
 							pat.setNom(nom);
+							pat.setCivilite(civilite);
 							pat.setPrenom(prenom);
 							System.out.println("Creation nouveau patient :"+pat);
 
@@ -543,10 +552,13 @@ public class Cabinet implements Serializable{
 						}
 						act.setCotation(cot);
 						act.setSoignant(soignant);
-						pat.addActe(act);
-						System.out.println("ajout patient :"+pat);
-						System.out.println("ajout cotation :"+cot);
-						System.out.println("ajout acte :"+act);
+						if(!pat.hasActe(crtDate)){
+							
+							pat.addActe(act);
+							System.out.println("ajout patient :"+pat);
+							System.out.println("ajout cotation :"+cot);
+							System.out.println("ajout acte :"+act);
+						}
 					}
 				}
 
