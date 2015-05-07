@@ -52,8 +52,9 @@ public class FichePat extends JFrame {
 		
 		this.setTitle("Fiche Patient");
 		this.setSize(500,600);
+		this.setLocation(550,100);
+
 		//this.setDefaultCloseOperation();
-		this.setLocationRelativeTo(null);
 		JPanel pan=new JPanel(new BorderLayout());
 		Box box=new Box(BoxLayout.Y_AXIS);
 		JPanel panMid=new JPanel(new BorderLayout());

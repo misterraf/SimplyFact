@@ -61,7 +61,7 @@ V2.0 :
 ------
 - DONE : effacer tous les actes de la db.
 - DONE : ajout crtSoignant dans cab, order dans Acte. MAJ db ==> v1.3
-- DONE : attention : export liste avec patient selectionnÃ© mais qui n'a pas de cotation par defaut... check avant export liste
+- DONE : attention : export liste avec patient selectionné mais qui n'a pas de cotation par defaut... check avant export liste
 - DONE : import listes.txt
   - DONE : gerer conflit quand patient hasacte(dateJour)
   - DONE : convertir str en cot 
@@ -87,7 +87,7 @@ V2.0 :
 - DONE : deplacer archives dans .\Archives\
 - DONE : trim espaces redondants dans nom, prenom
 - DONE : ajout specification soignant
-- DONE : si une date est specifiee dans import csv, ajout actes par defaut a la date donnÃ©e...
+- DONE : si une date est specifiee dans import csv, ajout actes par defaut a la date donnée...
 - DONE : writeCsv (inclure tous les champs)
 	--> DONE : passer la date courante en parametre
 	--> CANCELLED : export liste patients (sans date) / export liste patients selectionnes (avec date du jour)
@@ -97,14 +97,16 @@ V2.0 :
 - FIXED : ajout soignant si pas cancel, stack trace si combochange 
 - FIXED : stack trace si on efface le dernier soignant
 - FIXED : essayer Simply fact vierge, sans liste ni soignant defini
-- FIXED : import liste avec nouveau user, nouvel user pas affichÃ©
+- FIXED : import liste avec nouveau user, nouvel user pas affiché
 - FIXED : pas possible de modifier la cotation quand nouveau patient sans cotation par defaut.
 - FIXED : si pas de soignant defini, stack trace pour bouton stats
 - DONE : Ajout menu deroulant soigants en haut de la liste ?
 - DONE : en mode "tous soignants", desactiver edition de liste
 - DONE : si ajout d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
 - DONE : stats par soignant, 
-
+- DONE : trim espaces redondants dans nom, prenom
+- DONE : bouton calendar ? combobox ?
+- DONE : deplacer apparition fiche patient (pas au milieu de l'ecran...)
 
 TBD :
 -----
@@ -115,12 +117,11 @@ TBD :
   - reaffecter les actes 
 - effacer les actes d'un utilisateur de la db si l'utilisateur est efface (demander)
 - GUI pour reaffecter les actes : date debut / date fin, from->to (from doit etre different de to)
-- GUI pour gerer l'ordre des patients dans les listes exportÃ©es
+- GUI pour gerer l'ordre des patients dans les listes exportés
 - ajouter "Tous" a liste soignants par defaut
 - si crtSoignant=="Tous" : 
 	- modifier ficheStats pour refleter l'activite de tous les soignants
 - synchronisation db avec disque cloud
-- trim espaces redondants dans nom, prenom
 - 3 colonnes a cocher pour matin midi et soir au lieu de 1 seule pour les 3.
 - effacer patients inactifs : specifier date
 - runtime avec big db... generateur de db aleatoire ... /
@@ -129,7 +130,6 @@ TBD :
 	-> stocker sommes de cotation / nb actes dans cabinet ?
 - majDim auto ?
 - cotation totale dans PDF ?
-- bouton calendar ? combobox ?
 - dont scroll row(0) ?
 - jdialog pour chaque stacktrace
 - fichiers exportes : lesquels demander si ecraser ?
@@ -139,7 +139,7 @@ TBD :
 - tolerance sur nom / prenom (desalignement nom patient dans la db entre <> soigants) : s'il nexiste pas, demander creer ou rattacher a patient existant
 - si import d'un acte pour patient P, jour J soignant A et existe deja pour patient P, jour J soignant B, effacer acte pour soignant B
 
-- afficher un tick grisÃ© quand l'acte existe pour un autre soignant que le soignant courant : buttonrenderer different
+- afficher un tick grisé quand l'acte existe pour un autre soignant que le soignant courant : buttonrenderer different
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 

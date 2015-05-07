@@ -903,7 +903,6 @@ public class SimplyFact extends JFrame {
 
 	class LeftBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
-			//System.out.println("taille liste :"+tableau.getRowCount());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(crtDate);
 			cal.add(Calendar.DATE, -1);
@@ -915,7 +914,6 @@ public class SimplyFact extends JFrame {
 	}	
 	class RightBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
-			//System.out.println("taille liste :"+tableau.getRowCount());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(crtDate);
 			cal.add(Calendar.DATE, 1);
@@ -965,6 +963,22 @@ public class SimplyFact extends JFrame {
 	class CalBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			//System.out.println("taille liste :"+tableau.getRowCount());
+			CalendarSel cal=new CalendarSel(null,"Choisir la date",true);
+			SimpleDateFormat sdfm = new SimpleDateFormat("MM");
+			SimpleDateFormat sdfa = new SimpleDateFormat("yyy");
+			String mois=sdfm.format(crtDate);
+			String annee=sdfa.format(crtDate);
+			
+			
+			cal.setCrtMY(mois,annee);
+			Date selDate=cal.showCalendarSel();
+			System.out.println("date choisie : "+selDate);
+			crtDate=selDate;
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
+			dateEntry.setText(sdf.format(crtDate));
+
+			updateListSelection();
+			
 		}
 	}	
 
