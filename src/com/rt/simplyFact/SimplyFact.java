@@ -104,7 +104,7 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item3_2=new JMenuItem("Stats");
 	private JMenuItem item3_3=new JMenuItem("Debug : liste actes du jour");
 	private JComboBox soignantCB=new JComboBox();
-	private String version="2.0";
+	private String version="2.0.1";
 	public Cabinet cab=new Cabinet();
 	private Splash spl=new Splash(null,"A Propos...",true);
 	//public NewPatDialog newFichePat; 
@@ -1058,7 +1058,7 @@ public class SimplyFact extends JFrame {
 		if (!dir.exists()){
 			dir.mkdir();
 		}
-
+		System.out.println("Database version :"+cab.version);
 		if (cab.getVersion()==1.1){
 			cab.setVersion(1.2);
 			try {
@@ -1092,9 +1092,6 @@ public class SimplyFact extends JFrame {
 			JOptionPane.showMessageDialog(null, "Base de donnée mise Ã  jour correctement");
 			
 		}
-		String path=cab.getSyncPath();
-		UidSyncPath UID=new UidSyncPath();
-		System.out.println("Sync path of this machine ("+UID.getUID()+"): "+path);
 		
 		if (cab.getVersion()==1.2){
 			cab.setVersion(1.3);
@@ -1151,7 +1148,10 @@ public class SimplyFact extends JFrame {
 			JOptionPane.showMessageDialog(null, "Base de donnée mise Ã  jour correctement (-> v1.3)");
 			
 		}
-		
+		String path=cab.getSyncPath();
+		UidSyncPath UID=new UidSyncPath();
+		System.out.println("Sync path of this machine ("+UID.getUID()+"): "+path);
+	
 		
 	}
 	public void refreshList(){

@@ -108,6 +108,10 @@ V2.0 :
 - DONE : bouton calendar ? combobox ?
 - DONE : deplacer apparition fiche patient (pas au milieu de l'ecran...)
 
+V2.0.1 :
+- FIXED : bug a la mise a jour de la db 1.2 -> 1.3
+
+
 TBD :
 -----
 - definition d'une nouvelle cotation : si pas de cotation par defaut, elle devient la cot par defaut
