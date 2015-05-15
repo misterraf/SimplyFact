@@ -104,7 +104,7 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item3_2=new JMenuItem("Stats");
 	private JMenuItem item3_3=new JMenuItem("Debug : liste actes du jour");
 	private JComboBox soignantCB=new JComboBox();
-	private String version="2.0.1";
+	private String version="2.0.2";
 	public Cabinet cab=new Cabinet();
 	private Splash spl=new Splash(null,"A Propos...",true);
 	//public NewPatDialog newFichePat; 

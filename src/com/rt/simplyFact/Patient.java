@@ -110,7 +110,7 @@ public class Patient implements Serializable{
 	public void addActe(Date date,String soignant){
 		
 		String otherSoignant=this.hasOtherActe(date, soignant);
-		int confirm=0;
+		int confirm=1;
 		if (!otherSoignant.equals("")){
 		} 
 		if ((confirm==0)||(confirm==1)){

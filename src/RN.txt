@@ -111,6 +111,9 @@ V2.0 :
 V2.0.1 :
 - FIXED : bug a la mise a jour de la db 1.2 -> 1.3
 
+V2.0.2 :
+- FIXED : 2 soignants peuvent avoir un acte chacun pour le meme patient le meme jour
+
 
 TBD :
 -----
