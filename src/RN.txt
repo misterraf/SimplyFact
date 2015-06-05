@@ -114,9 +114,27 @@ V2.0.1 :
 V2.0.2 :
 - FIXED : 2 soignants peuvent avoir un acte chacun pour le meme patient le meme jour
 
-
+V2.1 : 
+- gestion de listes :
+	- DONE : nouveau GUI
+	- DONE : gestion de order dans actes
+	- DONE : affichage liste
+	- DONE : ajout dans liste avec order
+	- DONE : suppression dans liste
+	- DONE : refresh liste quand :
+		- DONE : clic on list btn, base sur la selection du jour
+		- DONE : chgt date (left, right, cal btns)
+		- DONE : chgt cotation (ex matin-> soir)
+	- DONE : nom dans la liste pat.toString() et non pas pat.getNom();
+	- DONE : export liste (csv + txt) a refaire, base sur listActesJour
+	- DONE : import liste (csv ? txt ?) a refaire, base sur listActesJour
+	- DONE : signaler en rouge si un patient apparait 2x sur le meme mMS --> colonne duplicate 
+	- DONE : deplacer ligne selectionnée vers le haut
+	- DONE : deplacer ligne selectionnée vers le bas
+	
 TBD :
 -----
+- fusionner 2 patients selectionnes
 - definition d'une nouvelle cotation : si pas de cotation par defaut, elle devient la cot par defaut
 - menu utilisateur avec 
   - ajout nouveau user
@@ -124,7 +142,6 @@ TBD :
   - reaffecter les actes 
 - effacer les actes d'un utilisateur de la db si l'utilisateur est efface (demander)
 - GUI pour reaffecter les actes : date debut / date fin, from->to (from doit etre different de to)
-- GUI pour gerer l'ordre des patients dans les listes exportés
 - ajouter "Tous" a liste soignants par defaut
 - si crtSoignant=="Tous" : 
 	- modifier ficheStats pour refleter l'activite de tous les soignants
@@ -150,6 +167,22 @@ TBD :
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 
+tbd v2.2
+- GUI gestion des ordonnances :
+	- nouvelle class ordonnance :
+		- date debut
+		- date prise d'effet
+		- date fin (==duree+date prise effet)
+		- medecin traitant
+		- motif de l'ordonnance (ex : ss cut, bas de cont etc)
+		- fichier associe
+	- pop up liste ordos arrivees a echeance au lancement
+	- visualiser ordo.pdf
+	- btn sur fiche patient
+	- btn pour gerer les ordos dans main() -> liste ordos classé par : ? nom ? date d'exp ?
+	- actions sur la liste : + / - / editer
+	- menu ordonnances
+	
 Bugs :
 ------
 essayer importCsv avec un patient sans cotation
