@@ -35,12 +35,8 @@ class ActTableModel extends AbstractTableModel{
 	//Définit la valeur à l'emplacement spécifié
 	public void setValueAt(Object value, int row, int col) {
 		//On interdit la modification sur certaines colonnes !
-		if((!this.getColumnName(col).equals("Voir"))&&(!this.getColumnName(col).equals("Cot°"))){
-				
 			this.data[row][col] = value;
 			this.fireTableDataChanged();
-
-		}
 	}
 
 	//Retourne la classe de la donnée de la colonne

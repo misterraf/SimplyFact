@@ -11,14 +11,18 @@ import java.awt.event.WindowListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +69,7 @@ public class SimplyFact extends JFrame {
 	private ImageIcon btnIcon11 = new ImageIcon(getClass().getResource("/Calendar.png"));
 	private ImageIcon btnIcon12 = new ImageIcon(getClass().getResource("/chart.png"));
 	private ImageIcon btnIcon13 = new ImageIcon(getClass().getResource("/delete.png"));
-	private JButton importCsvBtn = new JButton(btnIcon6);
+	//private JButton importCsvBtn = new JButton(btnIcon6);
 	private JButton saveBtn = new JButton(btnIcon2);
 	private JButton expPdfBtn = new JButton(btnIcon3);
 	private JButton expXlsBtn = new JButton(btnIcon5);
@@ -81,6 +85,7 @@ public class SimplyFact extends JFrame {
 	private Patient crtPat=null;
 	private Date crtDate=new Date();
 	private FichePat fp;
+	private FicheList fl;
 	private FicheStats fs;
 	private JMenuBar menuBar=new JMenuBar();
 	private JMenu menu1=new JMenu("Fichier");
@@ -104,8 +109,11 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item3_2=new JMenuItem("Stats");
 	private JMenuItem item3_3=new JMenuItem("Debug : liste actes du jour");
 	private JComboBox soignantCB=new JComboBox();
-	private String version="2.0.2";
-	public Cabinet cab=new Cabinet();
+	private String version="2.1";
+	private Cabinet cab=new Cabinet();
+	private List<ActeJour> listActesJour=new ArrayList<ActeJour>();
+	private int crtDayOrder=0;
+	
 	private Splash spl=new Splash(null,"A Propos...",true);
 	//public NewPatDialog newFichePat; 
 
@@ -151,7 +159,13 @@ public class SimplyFact extends JFrame {
 		this.setLayout(b);
 		//JOptionPane.showMessageDialog(null, getClass().getResource("/find.png")+ " "+btnIcon1.toString().substring(0,btnIcon1.toString().length()),"Erreur",JOptionPane.ERROR_MESSAGE);
 		//System.out.println(btnIcon1.toString().substring(6,btnIcon1.toString().length()));
-		btnPanel.add(importCsvBtn);
+		//importCsvBtn.setPreferredSize(new Dimension(50,35));
+		clearBtn.setPreferredSize(new Dimension(70,35));
+		saveBtn.setPreferredSize(new Dimension(70,35));
+		expPdfBtn.setPreferredSize(new Dimension(70,35));
+		expXlsBtn.setPreferredSize(new Dimension(70,35));
+		statsBtn.setPreferredSize(new Dimension(70,35));
+		//btnPanel.add(importCsvBtn);
 		btnPanel.add(clearBtn);
 		btnPanel.add(saveBtn);
 		btnPanel.add(expPdfBtn);
@@ -169,11 +183,11 @@ public class SimplyFact extends JFrame {
 		addSoignantBtn.addActionListener(new AddSoignantListener());
 		delSoignantBtn.addActionListener(new DelSoignantListener());
 		
-		importCsvBtn.setToolTipText("Import Excel .CSV");
-		clearBtn.setToolTipText("Effacer toutes les données");
+		//importCsvBtn.setToolTipText("Import Excel .CSV");
+		clearBtn.setToolTipText("Effacer les données");
 		saveBtn.setToolTipText("Sauvegarder les données");
 		expPdfBtn.setToolTipText("Export facturation .PDF du mois en cours");
-		expXlsBtn.setToolTipText("Exporter la liste des patients selectionnés (.CSV)");
+		expXlsBtn.setToolTipText("Liste des patients du jour");
 		statsBtn.setToolTipText("Statistiques");
 		this.getContentPane().add(btnPanel,BorderLayout.SOUTH);
 		this.getContentPane().add(selSoignantPanel,BorderLayout.NORTH);
@@ -228,10 +242,11 @@ public class SimplyFact extends JFrame {
 								if (selectedData==false){
 									// idx : cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString())
 									pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(selectedRow[i], 1).toString()));
+									crtDayOrder++;
 									if (cab.getCrtSoignant()>=0){
-										pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+										pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()),crtDayOrder);
 									} else {
-										pat.addActe(crtDate);
+										pat.addActe(crtDate,crtDayOrder);
 									}
 									pat.select();
 									System.out.println(crtDate+" selecting : "+pat.toString());
@@ -241,6 +256,8 @@ public class SimplyFact extends JFrame {
 									nbPatSelected++;
 									cab.setModified(true);
 									refreshData(pat);
+									refreshListActes();
+									
 
 
 								} else {
@@ -256,7 +273,8 @@ public class SimplyFact extends JFrame {
 									nbPatSelected--;
 									cab.setModified(true);
 									refreshData(pat);
-
+									refreshListActes();
+									
 								}
 							} else {
 								if (selectedData==false){
@@ -265,10 +283,11 @@ public class SimplyFact extends JFrame {
 										tableau.setValueAt(true, k, 2);
 										pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(k, 1).toString()));
 										pat.select();
+										crtDayOrder++;
 										if (cab.getCrtSoignant()>=0){
-											pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()));
+											pat.addActe(crtDate,cab.soignants.get(cab.getCrtSoignant()),crtDayOrder);
 										} else {
-											pat.addActe(crtDate);
+											pat.addActe(crtDate,crtDayOrder);
 										}
 										//										
 										//cab.patients.get(k-1).select();
@@ -277,6 +296,7 @@ public class SimplyFact extends JFrame {
 
 									}
 									refreshData(null);
+									refreshListActes();
 
 								} else {
 									nbPatSelected=0;
@@ -296,8 +316,10 @@ public class SimplyFact extends JFrame {
 									}
 									cab.setModified(true);
 									refreshData(null);
+									refreshListActes();
 
 								}
+								
 							}
 
 						}
@@ -306,6 +328,7 @@ public class SimplyFact extends JFrame {
 				}
 				tableau.clearSelection();
 				updateListSelection();
+				
 			}	
 			
 		});
@@ -314,8 +337,8 @@ public class SimplyFact extends JFrame {
 		saveBtn.addActionListener(new SaveBtnListener());
 		clearBtn.addActionListener(new ClearBtnListener());
 		expPdfBtn.addActionListener(new ExpPdfBtnListener());
-		expXlsBtn.addActionListener(new ExpXlsBtnListener());
-		importCsvBtn.addActionListener(new ImpCsvBtnListener());
+		expXlsBtn.addActionListener(new ListBtnListener());
+		//importCsvBtn.addActionListener(new ImpCsvBtnListener());
 		leftArrowBtn.addActionListener(new LeftBtnListener());
 		rightArrowBtn.addActionListener(new RightBtnListener());
 		calendarBtn.addActionListener(new CalBtnListener());
@@ -351,7 +374,7 @@ public class SimplyFact extends JFrame {
 		item1_1.addActionListener(new ImpFdbMenuListener());
 		item1_2.addActionListener(new SaveBtnListener());
 		item1_3.addActionListener(new ImpCsvBtnListener());
-		item1_4.addActionListener(new ExpXlsBtnListener());
+		item1_4.addActionListener(new ListBtnListener());
 		item1_5.addActionListener(new ExpPdfBtnListener());
 		item1_6.addActionListener(new ExitMenuListener());
 		item1_7.addActionListener(new SyncMenuListener());
@@ -579,6 +602,8 @@ public class SimplyFact extends JFrame {
 										} else {
 											newAct =new Acte(dcm.getDefCotMatin(),dj,soignant);
 										}
+										crtDayOrder++;
+										newAct.setOrder(crtDayOrder);
 										cab.patients.get(idx).addActe(newAct);
 
 									}
@@ -590,6 +615,8 @@ public class SimplyFact extends JFrame {
 										} else {
 											newAct=new Acte(dcm.getDefCotMidi(),dj,soignant);
 										}
+										crtDayOrder++;
+										newAct.setOrder(crtDayOrder);
 										cab.patients.get(idx).addActe(newAct);
 
 									}
@@ -601,11 +628,14 @@ public class SimplyFact extends JFrame {
 										} else {
 											newAct=new Acte(dcm.getDefCotSoir(),dj,soignant);
 										}
+										crtDayOrder++;
+										newAct.setOrder(crtDayOrder);
 										cab.patients.get(idx).addActe(newAct);
 
 									}
 									cab.setModified(true);
 									refreshData(pat);
+									refreshListActes();
 
 								}
 							}
@@ -703,7 +733,7 @@ public class SimplyFact extends JFrame {
 				writeArchive(cab,fileNameArch,true);
 
 			} else {
-				int option = JOptionPane.showConfirmDialog(null, "Attention :"+fileName+" existe déjÃ ... Voulez-vous l'écraser ?","Warning",JOptionPane.YES_NO_OPTION);
+				int option = JOptionPane.showConfirmDialog(null, "Attention :"+fileName+" existe déjà ... Voulez-vous l'écraser ?","Warning",JOptionPane.YES_NO_OPTION);
 				if(option == 0){
 					writeArchive(cab,fileNameArch,true);
 				}
@@ -843,20 +873,92 @@ public class SimplyFact extends JFrame {
 			}
 		}
 	}	
-	class ExpXlsBtnListener implements ActionListener{
+	class ListBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
-			cab.writeCsv(crtDate);
+			//cab.writeCsv(crtDate);
+			refreshListActes();
+			if (fl!=null) fl.dispose();
+			fl=new FicheList();
+			fl.setVisible(true);
+			fl.impListBtn.addActionListener(new ImpCsvBtnListener());
+			fl.expListBtn.addActionListener(new ExpListBtnListener());
+			fl.downListBtn.addActionListener(new DownListBtnListener());
+			fl.upListBtn.addActionListener(new UpListBtnListener());
+			fl.setFicheListInfo(listActesJour,0);
+
+		}
+	}	
+	class DownListBtnListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			int lineSel;
+			lineSel=fl.getSelectedLine();
+			//System.out.println("Ligne selectionnée :"+lineSel);
+			int size=listActesJour.size()-1;
+			if ((lineSel==size)||(lineSel<0)){
+				System.out.println("Bottom of list");
+			} else {
+				ActeJour crtAJ=listActesJour.get(lineSel);
+				ActeJour nextAJ=listActesJour.get(lineSel+1);
+				if ((crtAJ.getSoignant().equals(nextAJ.getSoignant()))&&
+						(crtAJ.getDateJour().toString().equals(nextAJ.getDateJour().toString()))
+						) {
+					
+					cab.setActeJourOrder(crtAJ.getDateJour(), crtAJ.getNomPatient(), nextAJ.getOrder());
+					cab.setActeJourOrder(nextAJ.getDateJour(), nextAJ.getNomPatient(), crtAJ.getOrder());
+					listActesJour.get(lineSel).setOrder(nextAJ.getOrder());
+					listActesJour.get(lineSel+1).setOrder(crtAJ.getOrder());
+					refreshListActes();
+					fl.setSelectedLine(lineSel+1);
+				} else {
+					System.out.println("Down impossible");
+				}
+			}
+		}
+	}
+	class UpListBtnListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+
+			int lineSel;
+			lineSel=fl.getSelectedLine();
+			//System.out.println("Ligne selectionnée :"+lineSel);
+			if (lineSel<=0){
+				System.out.println("top of list");
+			} else {
+				ActeJour crtAJ=listActesJour.get(lineSel);
+				ActeJour prevAJ=listActesJour.get(lineSel-1);
+				if ((crtAJ.getSoignant().equals(prevAJ.getSoignant()))&&
+						(crtAJ.getDateJour().toString().equals(prevAJ.getDateJour().toString()))
+						) {
+					
+					cab.setActeJourOrder(crtAJ.getDateJour(), crtAJ.getNomPatient(), prevAJ.getOrder());
+					cab.setActeJourOrder(prevAJ.getDateJour(), prevAJ.getNomPatient(), crtAJ.getOrder());
+					listActesJour.get(lineSel).setOrder(prevAJ.getOrder());
+					listActesJour.get(lineSel+1).setOrder(crtAJ.getOrder());
+					refreshListActes();
+					fl.setSelectedLine(lineSel-1);
+				} else {
+					System.out.println("up impossible");
+				}
+			}
+
+		}
+	}
+
+	class ExpListBtnListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			writeCsv(crtDate);
 
 		}
 	}	
 	class ImpCsvBtnListener implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			//System.out.println("taille liste :"+tableau.getRowCount());
-			cab.importCsv();
+			importCsv();
 			refreshList();
 			cab.setModified(true);
 			refreshData(null);
 			refreshSoignant();
+			refreshListActes();
 
 		}
 	}	
@@ -909,7 +1011,9 @@ public class SimplyFact extends JFrame {
 			crtDate=cal.getTime();
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 			dateEntry.setText(sdf.format(crtDate));
+			getCrtDayOrder();
 			updateListSelection();
+			refreshListActes();
 		}
 	}	
 	class RightBtnListener implements ActionListener{
@@ -920,7 +1024,10 @@ public class SimplyFact extends JFrame {
 			crtDate=cal.getTime();
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 			dateEntry.setText(sdf.format(crtDate));
+			getCrtDayOrder();
 			updateListSelection();
+			refreshListActes();
+
 
 		}
 	}	
@@ -976,8 +1083,11 @@ public class SimplyFact extends JFrame {
 			crtDate=selDate;
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 			dateEntry.setText(sdf.format(crtDate));
-
+			getCrtDayOrder();
+			refreshListActes();
 			updateListSelection();
+			
+
 			
 		}
 	}	
@@ -1048,6 +1158,7 @@ public class SimplyFact extends JFrame {
 			System.out.println("Soignant selectionné :"+cab.getCrtSoignant());
 
 			refreshSoignant();
+			getCrtDayOrder();
 			//updateListSelection();
 		}
 
@@ -1089,7 +1200,7 @@ public class SimplyFact extends JFrame {
 			File f=new File("archive_crt.fdb");
 			if (f.exists()){f.delete();}
 			writeArchive(cab,"archive_crt.fdb",false);
-			JOptionPane.showMessageDialog(null, "Base de donnée mise Ã  jour correctement");
+			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement");
 			
 		}
 		
@@ -1145,7 +1256,7 @@ public class SimplyFact extends JFrame {
 			File fPatch=new File("archive_crt.fdb");
 			if (fPatch.exists()){fPatch.delete();}
 			writeArchive(cab,"archive_crt.fdb",false);
-			JOptionPane.showMessageDialog(null, "Base de donnée mise Ã  jour correctement (-> v1.3)");
+			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement (-> v1.3)");
 			
 		}
 		String path=cab.getSyncPath();
@@ -1192,6 +1303,62 @@ public class SimplyFact extends JFrame {
 		updateListSelection();
 		
 	}
+	public void refreshListActes(){
+		ActeJour act;
+		Patient pat;
+		String dupStr;
+		boolean duplicate=false;
+		List<Acte> listAct=new ArrayList<Acte>();
+		List<String> listDup=new ArrayList<String>();
+		this.listActesJour.clear();
+		for(int i=0;i<this.cab.patients.size();i++){
+			pat=this.cab.patients.get(i);
+			listAct=pat.getActe(crtDate);
+			for(int j=0;j<listAct.size();j++){
+				dupStr=pat.toString()+";"+listAct.get(j).dateJour.getJour();
+				if(listDup.contains(dupStr)){
+					duplicate=true;
+				} else {
+					listDup.add(dupStr);
+					duplicate=false;
+				}
+				if (pat.getCivilite()!=null) {
+					addListActes(pat.getCivilite()+" "+pat.getNom(),pat.getPrenom(),listAct.get(j),duplicate);
+				} else {
+					addListActes(pat.getNom(),pat.getPrenom(),listAct.get(j),duplicate);
+				}
+				
+			}
+		}
+		for(int i=0;i<this.listActesJour.size();i++){
+			act=this.listActesJour.get(i);
+			System.out.println(act.getSoignant()+" "+act.getDateJour().getJour()+" "+act.getNomPatient()+" "+act.getCotation()+" "+act.getDuplicate());
+		}
+		if (fl!=null) fl.setFicheListInfo(listActesJour,0);
+		
+	}
+	public void addListActes(String nomPatient,String prenom,Acte act,boolean duplicate){
+		String soignant =act.getSoignant();
+		DateJour jour=act.getDateJour();
+		String cot=act.getCotation().toString();
+		int order=act.getOrder();
+		ActeJour aj=new ActeJour(jour,soignant,nomPatient,prenom,cot,order);
+		if (duplicate){aj.setDuplicate("  !");}
+		int idx=0;
+		for(int i=0;(i<this.listActesJour.size())&&(this.listActesJour.get(i).getSoignant().compareTo(soignant)<0);i++){idx++;}
+		for(int i=idx;(
+				i<this.listActesJour.size())&&
+				(this.listActesJour.get(i).getSoignant().equals(soignant))&&
+				(this.listActesJour.get(i).getDateJour().toString().compareTo(jour.toString())<0);i++){idx++;}
+		for(int i=idx;(i<this.listActesJour.size())&&
+				(this.listActesJour.get(i).getSoignant().equals(soignant))&&
+				(this.listActesJour.get(i).getDateJour().toString().equals(jour.toString()))&&
+				(this.listActesJour.get(i).getOrder()<order);i++){idx++;}
+		
+		this.listActesJour.add(idx,aj);
+		
+	}
+	
 	public void refreshSoignant(){
 		int prevSelSgt=cab.getCrtSoignant();
 
@@ -1334,7 +1501,7 @@ public class SimplyFact extends JFrame {
 			patSearch=tableau.getValueAt(i, 1).toString();
 			idx=cab.getPatientIdx(patSearch);
 			if (idx<0){
-				System.out.println("can't find \":"+tableau.getValueAt(i, 1).toString()+"\"");
+				System.out.println("can't find :\""+tableau.getValueAt(i, 1).toString()+"\"");
 			}
 			idx=cab.getPatientIdx(patSearch);
 			pat=cab.patients.get(cab.getPatientIdx(tableau.getValueAt(i, 1).toString()));
@@ -1483,8 +1650,197 @@ public class SimplyFact extends JFrame {
 		}
 	}
 	
+	public void getCrtDayOrder(){
+		int order = 0;
+		List<Acte> dayListAct=cab.getActesJour(crtDate);
+		Acte act;
+		for(int i=0;i<dayListAct.size();i++){
+			act=dayListAct.get(i);
+			if(act.getOrder()>order){
+				order=act.getOrder();
+			}
+		}
+		this.crtDayOrder=order;
+		
+		System.out.println("Top Order du jour :"+crtDayOrder);
+	}
+	
+	public void writeCsv(Date crtDate){
+		//Date crtDate=new Date();
+		System.out.println("exporting liste : ");
+		
+		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String fileName= "liste_"+sdf.format(crtDate)+".CSV";
+		String fileNameTxt= "liste_"+sdf.format(crtDate)+".txt";
+		System.out.println(fileName);
+		BufferedWriter bw=null;
+		BufferedWriter bwTxt=null;
+
+		try {
+			File dir=new File("Listes");
+			if (!dir.exists()) {
+				dir.mkdir();
+			}
+			File file = new File("Listes\\"+fileName);
+			File fileTxt = new File("Listes\\"+fileNameTxt);
+			
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			if (!fileTxt.exists()) {
+				fileTxt.createNewFile();
+			}
+			FileWriter fw=new FileWriter(file.getAbsoluteFile());
+			FileWriter fwTxt=new FileWriter(fileTxt.getAbsoluteFile());
+			bw=new BufferedWriter(fw);
+			bwTxt=new BufferedWriter(fwTxt);
+			String line="Date;"+sdf2.format(crtDate)+"\n";
+			bw.write(line);
+			line="Soignant;mMS;Nom;Prenom;Cotation"+System.getProperty("line.separator");
+			bw.write(line);
+			bwTxt.write("Listes du :"+sdf2.format(crtDate)+System.getProperty("line.separator"));
+			
+			String soignant="";
+			ActeJour aj;
+			for (int i=0;i<listActesJour.size();i++){
+				aj=listActesJour.get(i);
+				if(!aj.getSoignant().equals(soignant)){
+					soignant=aj.getSoignant();
+					line=System.getProperty("line.separator")+"Liste pour : "+soignant+System.getProperty("line.separator");
+					bwTxt.write(line);
+				}
+				line=aj.getDateJour().getJour()+"\t"+aj.getNomPatient()+" "+aj.getPrenom()+"\t\t"+aj.getCotation()+System.getProperty("line.separator");
+				bwTxt.write(line);
+				line=aj.getSoignant()+";"+aj.getDateJour().getJour()+";"+aj.getNomPatient()+";"+aj.getPrenom()+";"+aj.getCotation()+System.getProperty("line.separator");
+				bw.write(line);
+			}
+			JOptionPane.showMessageDialog(null, "Listes : "+fileNameTxt+","+fileName+" exportées avec succès");
+
+
+		}	catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.toString(),"Erreur",JOptionPane.ERROR_MESSAGE);
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (bwTxt != null) {
+				try {
+					bwTxt.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	
 
+	public void importCsv(){
+	String line="";
+	BufferedReader br=null;
+	JFileChooser chooser = new JFileChooser();
+	FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"fichier .csv", "csv");
+	chooser.setFileFilter(filter);
+	chooser.setCurrentDirectory(new File(".\\Listes"));
+	int returnVal = chooser.showOpenDialog(null);
+	if(returnVal == JFileChooser.APPROVE_OPTION) {
+		String fileName=chooser.getSelectedFile().getAbsolutePath();
+		System.out.println("You chose to open this file: " +fileName );
+		try {
+			//patients.clear();
+			br = new BufferedReader(new FileReader(fileName));
 
+			String soignant="";
+			String jourStr;
+			String patStr;
+			String prenom;
+			Cotation cot;
+			int initOrder=crtDayOrder;
+			while ((line = br.readLine()) != null) {
+				if(line.contains("Date")){
+					String[] lineSpl=line.split(";");
+					String dateStr=lineSpl[lineSpl.length-1].trim();
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					try {
+						crtDate=sdf.parse(dateStr);
+						dateEntry.setText(sdf.format(crtDate));
+						getCrtDayOrder();
+						refreshListActes();
+
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+
+				} else if(!line.contains("Soignant")){
+					String[] lineSpl=line.split(";");
+					soignant=lineSpl[0];
+					if(!cab.soignants.contains(soignant)){
+						cab.addSoignant(soignant);
+						refreshSoignant();
+					}
+					jourStr=lineSpl[1];
+					patStr=lineSpl[2];
+					prenom=lineSpl[3];
+					Jour jour=Jour.matin;
+					cot=new Cotation(lineSpl[4]);
+					if (jourStr.equals("midi")){
+						jour=Jour.midi;
+					} else if (jourStr.equals("soir")){
+						jour=Jour.soir;
+					} 
+					DateJour dj=new DateJour(crtDate,jour);
+					Acte act=new Acte(cot,dj,soignant);
+					initOrder++;
+					act.setOrder(initOrder);
+					int idx=-1;
+					if (!prenom.equals("")){
+						idx=cab.getPatientIdx(patStr+" "+prenom);
+					} else {
+						idx=cab.getPatientIdx(patStr);
+					}
+					
+					if(idx<0) {
+						Patient pat=new Patient(patStr,prenom);
+						pat.addCotation(cot);
+						pat.addActe(act);
+						cab.addPatient(pat);
+						// ajout cot par defaut selon jour
+					} else {
+						Patient pat=cab.patients.get(idx);
+						pat.addCotation(cot);
+						if (!pat.hasActe(act)){
+							pat.addActe(act);
+						}
+					}
+				}
+			}
+
+		} catch (FileNotFoundException e) {
+			System.out.println(fileName+" n'existe pas !");
+			JOptionPane.showMessageDialog(null, fileName+" n'existe pas !","Erreur",JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.toString(),"Erreur",JOptionPane.ERROR_MESSAGE);
+
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+					refreshListActes();
+					updateListSelection();
+					JOptionPane.showMessageDialog(null,"Liste Importee avec succes");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+}
 
 }

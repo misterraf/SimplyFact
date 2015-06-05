@@ -34,26 +34,64 @@ public class Patient implements Serializable{
 		this.civilite=null;
 	}
 	public Patient(String nom){
-		this.nom=nom.toUpperCase();
+		this.nom="";
 		this.prenom="";
 		this.adresse="";
 		this.selected=false;
 		this.visible=true;
 		this.tel="";
 		this.civilite=null;
+		
+		String[] nameParts=nom.trim().split(" ");
+		int startSearch =0;
+		
+		if ((nameParts[0].equals("Mme"))||(nameParts[0].equals("Mr"))){
+			if (nameParts[0].equals("Mme")) {
+				civilite=MrMme.Mme;
+			} else {
+				civilite=MrMme.Mr;
+			}
+			startSearch=1;
+		}
+		this.nom=nameParts[startSearch].trim().toUpperCase();
+		for (int i=startSearch+1;i<nameParts.length;i++){
+			if(!nameParts[i].trim().equals("")){
+				this.nom=this.nom+" "+nameParts[i].trim().toUpperCase();
+			}
+		}
+			
 	}
 	public Patient(String nom,String prenom){
-		this.nom=nom.toUpperCase();
+		this.nom="";
 		this.prenom=formatPrenom(prenom);
 		adresse="";
 		selected=false;
 		visible=true;
 		tel="";
 		civilite=null;
+		String nomStr="";
+		String[] nameParts=nom.trim().split(" ");
+		int startSearch =0;
+
+		if ((nameParts[0].equals("Mme"))||(nameParts[0].equals("Mr"))){
+			if (nameParts[0].equals("Mme")) {
+				civilite=MrMme.Mme;
+			} else {
+				civilite=MrMme.Mr;
+			}
+			startSearch=1;
+		}
+		nomStr=nameParts[startSearch].trim().toUpperCase();
+		for (int i=startSearch+1;i<nameParts.length;i++){
+			if(!nameParts[i].trim().equals("")){
+				nomStr=nomStr+" "+nameParts[i].trim().toUpperCase();
+			}
+		}
+		this.nom=nomStr;
 	}
 	public void addCotation(Cotation cot){
 		if (!defCot.contains(cot)){
-		defCot.add(cot);
+			defCot.add(cot);
 		}
 	}
 	public void addActe(Acte act){
@@ -61,11 +99,12 @@ public class Patient implements Serializable{
 		this.addCotation(act.cotation);
 		this.sortDefCot();
 	}
-	public void addActe(Date date){
+	public void addActe(Date date,int order){
 		this.removeActe(date);
 		if (!this.defCotMatin.toString().equals("")) {
 			DateJour dj=new DateJour(date,Jour.matin);
 			Acte act=new Acte(defCotMatin,dj);
+			act.setOrder(order);
 			facturation.add(act);
 			this.addCotation(defCotMatin);
 			//System.out.println("ajout cotation : "+defCotMatin);
@@ -73,6 +112,7 @@ public class Patient implements Serializable{
 		if (!this.defCotMidi.toString().equals("")) {
 			DateJour dj=new DateJour(date,Jour.midi);
 			Acte act=new Acte(defCotMidi,dj);
+			act.setOrder(order);
 			facturation.add(act);
 			this.addCotation(defCotMidi);
 			//System.out.println("ajout cotation : "+defCotMidi);
@@ -80,6 +120,7 @@ public class Patient implements Serializable{
 		if (!this.defCotSoir.toString().equals("")) {
 			DateJour dj=new DateJour(date,Jour.soir);
 			Acte act=new Acte(defCotSoir,dj);
+			act.setOrder(order);
 			facturation.add(act);
 			this.addCotation(defCotSoir);
 			//System.out.println("ajout cotation : "+defCotSoir);
@@ -107,7 +148,7 @@ public class Patient implements Serializable{
 			}
 		}
 	}
-	public void addActe(Date date,String soignant){
+	public void addActe(Date date,String soignant,int order){
 		
 		String otherSoignant=this.hasOtherActe(date, soignant);
 		int confirm=1;
@@ -123,6 +164,7 @@ public class Patient implements Serializable{
 			if (!this.defCotMatin.toString().equals("")) {
 				DateJour dj=new DateJour(date,Jour.matin);
 				Acte act=new Acte(defCotMatin,dj,soignant);
+				act.setOrder(order);
 				facturation.add(act);
 				this.addCotation(defCotMatin);
 				//System.out.println("ajout cotation : "+defCotMatin);
@@ -130,6 +172,7 @@ public class Patient implements Serializable{
 			if (!this.defCotMidi.toString().equals("")) {
 				DateJour dj=new DateJour(date,Jour.midi);
 				Acte act=new Acte(defCotMidi,dj,soignant);
+				act.setOrder(order);
 				facturation.add(act);
 				this.addCotation(defCotMidi);
 				//System.out.println("ajout cotation : "+defCotMidi);
@@ -137,6 +180,7 @@ public class Patient implements Serializable{
 			if (!this.defCotSoir.toString().equals("")) {
 				DateJour dj=new DateJour(date,Jour.soir);
 				Acte act=new Acte(defCotSoir,dj,soignant);
+				act.setOrder(order);
 				facturation.add(act);
 				this.addCotation(defCotSoir);
 				//System.out.println("ajout cotation : "+defCotSoir);
@@ -335,6 +379,24 @@ public class Patient implements Serializable{
 			DateJour dja=act.getDateJour();
 
 			if ((act.getSoignant().equals(soig))&&(dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
+				factDate.add(act);			}
+		}
+		return factDate;
+
+	}	
+	public List<Acte> getActe(Date crtDate){
+		SimpleDateFormat sdfM = new SimpleDateFormat("MM");
+		SimpleDateFormat sdfA = new SimpleDateFormat("yyyy");
+		SimpleDateFormat sdfJ = new SimpleDateFormat("dd");
+		String mois=sdfM.format(crtDate);
+		String annee=sdfA.format(crtDate);
+		String jour=sdfJ.format(crtDate);
+		List<Acte> factDate=new ArrayList<Acte>();
+		for(int i=0;i<this.facturation.size();i++){
+			Acte act=this.facturation.get(i);
+			DateJour dja=act.getDateJour();
+
+			if ((dja.getDateMois().equals(mois))&&(dja.getDateAnnee().equals(annee))&&(dja.getDateJour().equals(jour))){
 				factDate.add(act);			}
 		}
 		return factDate;

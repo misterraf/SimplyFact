@@ -132,7 +132,39 @@ public class Cabinet implements Serializable{
 		return this.crtSoignant;
 	}
 	
-	public int getPatientIdx(Patient pat){
+	public List<Acte> getActesJour(Date date){
+		List<Acte> dayListAct=new ArrayList<Acte>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		Patient pat;
+		Acte act;
+		for (int i=0;i<this.patients.size();i++){
+			pat=this.patients.get(i);
+			for(int j=0;j<pat.getActe().size();j++){
+				act=pat.getActe().get(j);
+				if (act.getDateJour().getDate().equals(date)){
+					dayListAct.add(act);
+				}
+			}
+		}
+		return dayListAct;
+	}
+	public void setActeJourOrder(DateJour dj,String patient,int order){
+		Patient pat;
+		Acte act=null;
+		for (int i=0;i<this.patients.size();i++){
+			pat=this.patients.get(i);
+			if (pat.toString().equals(patient)){
+				for(int j=0;j<pat.getActe().size();j++){
+					act=pat.getActe().get(j);
+					if (act.getDateJour().equals(dj)){
+						act.setOrder(order);
+					}
+				}
+			}
+		}
+		
+	}
+public int getPatientIdx(Patient pat){
 		int idx=-1;
 		for (int i=0;i<patients.size();i++){
 			if(patients.get(i).equals(pat)){idx= i;}
@@ -278,164 +310,7 @@ public class Cabinet implements Serializable{
 		}
 		return patFailList;
 	}
-	public void writeCsv(Date crtDate){
-		//Date crtDate=new Date();
-		String test=checkIfNoEmptyDefCot();
-		if(!test.equals("")){
-			int confirm = JOptionPane.showOptionDialog(null, test+" n'ont pas de cotation par défaut\n(et ne seront donc pas exportés dans les listes).\nVoulez-vous exporter la liste ?", "Avertissement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-			if (confirm != 0) {return;}
-
-		}
-		System.out.println("exporting liste : (test :"+test+")");
-		
-		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyy");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		String fileName= "liste_"+sdf.format(crtDate)+".CSV";
-		String fileNameTxt= "liste_"+sdf.format(crtDate)+".txt";
-		System.out.println(fileName);
-		BufferedWriter bw=null;
-		BufferedWriter bwTxt=null;
-
-		try {
-			File dir=new File("Listes");
-			if (!dir.exists()) {
-				dir.mkdir();
-			}
-			File file = new File("Listes\\"+fileName);
-			File fileTxt = new File("Listes\\"+fileNameTxt);
-			
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			if (!fileTxt.exists()) {
-				fileTxt.createNewFile();
-			}
-			FileWriter fw=new FileWriter(file.getAbsoluteFile());
-			FileWriter fwTxt=new FileWriter(fileTxt.getAbsoluteFile());
-			bw=new BufferedWriter(fw);
-			bwTxt=new BufferedWriter(fwTxt);
-			String line="Date;"+sdf2.format(crtDate)+"\n";
-			bw.write(line);
-			bwTxt.write("Listes du :"+sdf2.format(crtDate)+System.getProperty("line.separator"));
-			
-			String soignant;
-			for (int s=0;s<soignants.size();s++){
-				soignant=soignants.get(s);
-				line="\n\"Liste pour :\";"+soignant+"\n";
-				bw.write(line);
-				bwTxt.write(System.getProperty("line.separator")+"Liste pour : "+soignant+System.getProperty("line.separator"));
-				line="Civilite;Nom;Prenom;Adresse;Tel;MMS;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;Nb;Cotation;Coefficient;MAU;MCI;MajDim;MajNuit;IFD;IK;commentaire\n";
-				bw.write(line);
-
-				for (int i=0;i<patients.size();i++) {
-					Patient pat=patients.get(i);
-					if (pat.hasActe(crtDate, soignant)) {
-						List<Acte> actList=pat.getActe(crtDate, soignant);
-						for (int j=0;j<actList.size();j++){
-							Acte crtAct=actList.get(j);
-							line="";
-							if (pat.getCivilite()!=null) {
-								line=line+pat.getCivilite()+";";
-							} else { 
-								line=line+";";
-							}
-							if (pat.getNom()!=null) {
-								line=line+pat.getNom()+";";
-							} else { 
-								line=line+";";
-							}
-							if (pat.getPrenom()!=null) {
-								line=line+pat.getPrenom()+";";
-							} else { 
-								line=line+";";
-							}
-							if (pat.getAdresse()!=null) {
-								line=line+pat.getAdresse()+";";
-							} else { 
-								line=line+";";
-							}
-							if (pat.getTel()!=null) {
-								line=line+pat.getTel()+";";
-							} else { 
-								line=line+";";
-							}
-							line=line+crtAct.getDateJour().getJour().toString()+";";
-							line=line+String.valueOf(crtAct.getCotation().getK11())+";";
-							line=line+crtAct.getCotation().gettypeActe1().toString()+";";
-							line=line+String.valueOf(crtAct.getCotation().getK12())+";";
-							if (crtAct.getCotation().gettypeActe2().equals(TypeActe.aucun)){
-								line=line+";;;";
-							} else {
-								line=line+String.valueOf(crtAct.getCotation().getK21())+";";
-								line=line+crtAct.getCotation().gettypeActe2().toString()+";";
-								line=line+String.valueOf(crtAct.getCotation().getK22())+";";
-							}
-							if (crtAct.getCotation().gettypeActe3().equals(TypeActe.aucun)){
-								line=line+";;;";
-							} else {
-								line=line+String.valueOf(crtAct.getCotation().getK31())+";";
-								line=line+crtAct.getCotation().gettypeActe3().toString()+";";
-								line=line+String.valueOf(crtAct.getCotation().getK32())+";";
-							}
-							if (crtAct.getCotation().getMau()){
-								line=line+"oui;";
-							} else {
-								line=line+";";
-							}
-							if (crtAct.getCotation().getMci()){
-								line=line+"oui;";
-							} else {
-								line=line+";";
-							}
-							if (crtAct.getCotation().getMajDim()){
-								line=line+"oui;";
-							} else {
-								line=line+";";
-							}
-							if (crtAct.getCotation().getMajNuit()){
-								line=line+"oui;";
-							} else {
-								line=line+";";
-							}
-							if (crtAct.getCotation().getIfd()){
-								line=line+"oui;";
-							} else {
-								line=line+";";
-							}
-							line=line+crtAct.getCotation().getIk()+";";
-							line=line+crtAct.getCotation().getComment()+";";
-							line=line+"\n";
-							bw.write(line);
-							bwTxt.write(pat.toString()+" "+crtAct.getDateJour().getJour().toString()+":"+crtAct.getCotation().toString()+System.getProperty("line.separator"));
-						}
-
-					}
-				}
-			}
-			JOptionPane.showMessageDialog(null, "Liste : "+fileNameTxt+" exportée avec succès");
-
-
-		}	catch (IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, e.toString(),"Erreur",JOptionPane.ERROR_MESSAGE);
-		} finally {
-			if (bw != null) {
-				try {
-					bw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (bwTxt != null) {
-				try {
-					bwTxt.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	public void importCsv(){
+		public void importCsv(){
 		String line="";
 		BufferedReader br=null;
 		JFileChooser chooser = new JFileChooser();
