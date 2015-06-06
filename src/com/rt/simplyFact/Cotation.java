@@ -210,7 +210,7 @@ public class Cotation implements Serializable{
 				}
 			} else {
 				if (k2_1==(int)k2_1) {
-					cot="+"+(int)k2_1+"AIS";
+					cot=cot+"+"+(int)k2_1+"AIS";
 				} else {
 					cot=cot+"+"+k2_1+"AIS";
 				}
@@ -413,6 +413,8 @@ public class Cotation implements Serializable{
 	}
 	public void settypeActe1(TypeActe iact){
 		typeActe1=iact;
+		cotation=this.setCotStr();
+		totalCotation=this.setCotation();
 	}
 	public void settypeActe2(TypeActe iact){
 		typeActe2=iact;

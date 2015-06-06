@@ -636,6 +636,7 @@ public class SimplyFact extends JFrame {
 									cab.setModified(true);
 									refreshData(pat);
 									refreshListActes();
+									updateListSelection();
 
 								}
 							}

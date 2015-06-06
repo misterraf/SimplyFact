@@ -132,6 +132,10 @@ V2.1 :
 	- DONE : deplacer ligne selectionnée vers le haut
 	- DONE : deplacer ligne selectionnée vers le bas
 	
+V2.1.1 :
+- FIXED : definition cotation : AMI + AIS => "" + xAISx
+- FIXED : ajout patient sans cot. cliquer patient, modifier cotation, ajout nouvelle cotation. Le tick a disparu, mais l'acte reste enregistre (present dans la liste)
+	
 TBD :
 -----
 - fusionner 2 patients selectionnes
