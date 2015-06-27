@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,6 +23,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.table.TableRowSorter;
 
 
 public class FichePat extends JFrame {
@@ -36,22 +41,30 @@ public class FichePat extends JFrame {
 	private String annee;
 	private String soignant;
 	protected Patient pat;
+	protected JTable listOrdos;
 	private JTable acteTable1;
 	private JTable acteTable2;
 	private DefaultListModel dataList2=new DefaultListModel();
 	private ImageIcon btnIcon1 = new ImageIcon(getClass().getResource("/close.png"));
 	private ImageIcon btnIcon2 = new ImageIcon(getClass().getResource("/exportPDF.png"));
+	private ImageIcon btnIcon3 = new ImageIcon(getClass().getResource("/File-New-icon.png"));
+	private ImageIcon btnIcon4 = new ImageIcon(getClass().getResource("/edit-icon.png"));
+	private ImageIcon btnIcon8 = new ImageIcon(getClass().getResource("/File-Delete-icon.png"));
+	private ImageIcon btnIcon7 = new ImageIcon(getClass().getResource("/Document-Preview-icon.png"));
 	private JButton closeBtn = new JButton("Fermer",btnIcon1);
 	private JButton expPdfBtn = new JButton("Export PDF",btnIcon2);
-	protected JButton changeBtn = new JButton("Modifier");
+	protected JButton addOrdoBtn = new JButton(btnIcon3);
+	protected JButton delOrdoBtn = new JButton(btnIcon8);
+	private JButton viewOrdoBtn = new JButton(btnIcon7);
+	protected JButton changeBtn = new JButton("Modifier",btnIcon4);
 	private DefaultListModel dataList=new DefaultListModel();
 	private JComboBox moisList = new JComboBox();
 	private JComboBox anneeList = new JComboBox();
-
+	
 	public FichePat() {
 		
 		this.setTitle("Fiche Patient");
-		this.setSize(500,600);
+		this.setSize(500,750);
 		this.setLocation(550,100);
 
 		//this.setDefaultCloseOperation();
@@ -64,18 +77,21 @@ public class FichePat extends JFrame {
 		JPanel panCivil=new JPanel(civGrid);
 
 		JPanel panCot=new JPanel(new BorderLayout());
+		JPanel panOrdos=new JPanel(new BorderLayout());
 		Box boxCot=new Box(BoxLayout.Y_AXIS);
 		panCot.add(boxCot,BorderLayout.CENTER);
 		JPanel panActes=new JPanel(new BorderLayout());
 		pan.add(panMid,BorderLayout.CENTER);
 		panMid.setBorder(BorderFactory.createTitledBorder("Fiche Patient"));
 		panCivil.setBorder(BorderFactory.createTitledBorder("Etat Civil"));
+		panOrdos.setBorder(BorderFactory.createTitledBorder("Ordonnances en cours"));
 		panCot.setBorder(BorderFactory.createTitledBorder("Cotations"));
 		panActes.setBorder(BorderFactory.createTitledBorder("Actes"));
 		Box boxAct=new Box(BoxLayout.Y_AXIS);
 		panActes.add(boxAct,BorderLayout.CENTER);
 		panMid.add(box);
 		box.add(panCivil);
+		box.add(panOrdos);
 		box.add(panCot);
 		box.add(panActes);
 		//pan.setBackground(Color.MAGENTA);
@@ -206,18 +222,59 @@ public class FichePat extends JFrame {
 		panActes.add(acteDatePanel,BorderLayout.NORTH);
 		panActes.add(acteCotPanel,BorderLayout.CENTER);
 
+		String ordoTitle[]={"Date Presc.","Motif","Médecin"};
+		Object[][] ordoData=new Object[1][3];
+		for (int i=0;i<3;i++){
+			ordoData[0][i]="";
+		}
+		
+		OrdoTableModel ordoModel=new OrdoTableModel(ordoData,ordoTitle);
+		listOrdos=new JTable(ordoModel);
+		JScrollPane os=new JScrollPane(listOrdos);
+		RowSorter<OrdoTableModel> sorter = new TableRowSorter<OrdoTableModel>(ordoModel);
+		listOrdos.setRowSorter(sorter);
+		listOrdos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		os.setPreferredSize(new Dimension(400,350));
+		panOrdos.add(os);
+		
 		//fillData(this.mois,this.annee);
 		JPanel btnPanel=new JPanel();
+		addOrdoBtn.setToolTipText("Ajouter une ordonnance");
+		delOrdoBtn.setToolTipText("Effacer l'ordonnance selectionnée");
+		viewOrdoBtn.setToolTipText("Voir l'ordonnance selectionnée");
+		expPdfBtn.setToolTipText("Exporter la facturation (pdf) de ce patient");
+		btnPanel.add(addOrdoBtn);
+		btnPanel.add(delOrdoBtn);
+		btnPanel.add(viewOrdoBtn);
 		btnPanel.add(expPdfBtn);
 		btnPanel.add(closeBtn);
+	
+		//delOrdoBtn.setEnabled(false);
+		//viewOrdoBtn.setEnabled(false);
 		
 		pan.add(btnPanel,BorderLayout.SOUTH);
-		closeBtn.addActionListener(new closeBtnListener());
-		expPdfBtn.addActionListener(new expPdfBtnListener());
+		closeBtn.addActionListener(new CloseBtnListener());
+		viewOrdoBtn.addActionListener(new ViewOrdoBtnListener());
+		expPdfBtn.addActionListener(new ExpPdfBtnListener());
 		//changeBtn.addActionListener(new changeBtnListener());
 		setContentPane(pan);
 
 		//this.setVisible(true);                             
+	}
+	public void refreshOrdoList(){
+		((OrdoTableModel)listOrdos.getModel()).clear();
+		Ordonnance ordo;
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
+		for(int i=0;i<pat.getOrdos().size();i++){
+			ordo=pat.getOrdos().get(i);
+			if (!ordo.isArchived()){
+			Object[] ordoData=new Object[3];
+			ordoData[0]=sdf.format(ordo.getDatePresc());
+			ordoData[1]=ordo.getMotif();
+			ordoData[2]=ordo.getMedecin();
+			((OrdoTableModel)listOrdos.getModel()).addRow(ordoData);
+			}
+		}
 	}
 	public void updateDataMois(String mois){
 		fillData(mois,this.annee,this.soignant);
@@ -233,6 +290,7 @@ public class FichePat extends JFrame {
 		this.annee=annee;
 		this.soignant=soignant;
 		fillData(mois,annee,soignant);
+		refreshOrdoList();
 	}
 	public void fillData(String mois,String annee,String soignant){
 		lbNom.setText("Nom : "+pat.toString());
@@ -323,39 +381,13 @@ public class FichePat extends JFrame {
 		}
 	}
 
-	class closeBtnListener implements ActionListener{
+	class CloseBtnListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent event) {
 			dispose();
 		}
 	}	
-//	class changeBtnListener implements ActionListener{
-//
-//		public void actionPerformed(ActionEvent event) {
-//			NewPatDialog npd=new NewPatDialog(null,"Modifier Patient",true);
-//			//NewPatDialog SimplyFact.newFichePat=new NewPatDialog(null,"Modifier Patient",true);
-//			Patient newPat=new Patient();
-//			//Patient oldPat=new Patient();
-//			//oldPat.setNom(pat.getNom());
-//			//oldPat.setPrenom(pat.getPrenom());
-////			oldPat.setNom(pat.getNom());
-////			oldPat.setNom(pat.getNom());
-////			oldPat.setNom(pat.getNom());
-//			newPat=npd.showNewPatDialog();
-//			//npd.setFields(oldPat.getCivilite(),oldPat.getNom(),oldPat.getPrenom(),oldPat.getAdresse(),oldPat.getTel());
-//			if(!newPat.toString().equals("pas de patient")){
-//				
-//				pat.setNom(newPat.getNom());
-//				System.out.println("nouveau patient :"+newPat.toString());
-//				System.out.println("patient :"+pat.toString());
-//				fillData(mois,annee);
-//			} else {
-//				//System.out.println("cancelled");
-//			}
-//			
-//		}
-//	}	
-	class expPdfBtnListener implements ActionListener{
+	class ExpPdfBtnListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent event) {
 			if (pat.hasActe(mois, annee)) {
@@ -367,5 +399,24 @@ public class FichePat extends JFrame {
 			}
 		}
 	}	
+	class ViewOrdoBtnListener implements ActionListener{
 
+		public void actionPerformed(ActionEvent event) {
+			if (listOrdos.getSelectedRow()>=0){
+				String date= listOrdos.getValueAt(listOrdos.getSelectedRow(),0).toString();
+				String motif= listOrdos.getValueAt(listOrdos.getSelectedRow(),1).toString();
+				String medecin= listOrdos.getValueAt(listOrdos.getSelectedRow(),2).toString();
+				if(!date.equals("")){
+					Ordonnance ordo=pat.getOrdo(date,motif,medecin);
+					String fileName=ordo.getFileName();
+					File viewFile=new File(fileName);
+					try {
+						Runtime.getRuntime().exec("rundll32 SHELL32.DLL,ShellExec_RunDLL " +viewFile.getAbsolutePath());
+					} catch (IOException e){
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}	
 }	

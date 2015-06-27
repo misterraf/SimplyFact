@@ -1,4 +1,5 @@
 package com.rt.simplyFact;
+import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ public class Patient implements Serializable{
 	private boolean selected;
 	private boolean visible;
 	private List<Acte> facturation=new ArrayList<Acte>();
-	private List<String> ordos,muts=new ArrayList<String>();
+	private List<Ordonnance> ordos=new ArrayList<Ordonnance>();
+	private List<String> muts=new ArrayList<String>();
+	private List<String> medecins=new ArrayList<String>();
 	private List<Cotation> defCot=new ArrayList<Cotation>();
 	private Cotation defCotMatin=new Cotation();
 	private Cotation defCotMidi=new Cotation();
@@ -276,8 +279,52 @@ public class Patient implements Serializable{
 	public boolean isSelected(){
 		return selected;
 	}
-	public void addOrdo(String ord){
+	public void addOrdo(Ordonnance ord){
 		ordos.add(ord);
+	}
+	public void delOrdo(Ordonnance ord){
+		ordos.remove(ord);
+	}
+	public void archiveOrdo(Ordonnance ord){
+		Ordonnance ordo;
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		for(int i=0;i<ordos.size();i++){
+			
+			if (ordos.get(i).equals(ord)){
+				ordo=ordos.get(i);
+				ordos.get(i).archive(true);
+				String fileName=ordo.getFileName();
+				File newFile=new File(fileName);
+				
+				String newFileName=newFile.getName();
+				String[] newFileStr=newFileName.split("_");
+				String subDir=newFileStr[2]+"_"+newFileStr[3];
+				File dir=new File("Archives Ordos");
+				if(!dir.exists()){
+					dir.mkdir();
+				}
+				
+				dir=new File("Archives Ordos\\"+subDir);
+				if(!dir.exists()){
+					dir.mkdir();
+				}
+				newFileName="Archives Ordos\\"+subDir+"\\"+newFileName;
+				File fileDest=new File(newFileName);
+				JOptionPane.showMessageDialog(null,"Ordo de :"+this.nom+"\nEst arrivée a expiration ("+sdf.format(ordo.getDateFin())+"). Archivage du fichier dans :\n"+newFileName);
+				newFile.renameTo(fileDest);
+				ordos.get(i).setFileName(newFileName);
+				break;
+			}
+		}
+	}
+	public void addMedecin(String medecin){
+		medecins.add(medecin);
+	}
+	public void setMedecins(List<String> medecins){
+		this.medecins=medecins;
+	}
+	public void setOrdos(List<Ordonnance> ordos){
+		this.ordos=ordos;
 	}
 	public void addMut(String mut){
 		muts.add(mut);
@@ -655,6 +702,23 @@ public class Patient implements Serializable{
 	
 	public List<Cotation> getCotList(){
 		return this.defCot;
+	}
+	public List<Ordonnance> getOrdos(){
+		return this.ordos;
+	}
+	public Ordonnance getOrdo(String date,String motif,String medecin){
+		Ordonnance ordoTmp=new Ordonnance(date,motif,medecin);
+		Ordonnance ordo=new Ordonnance();
+		for (int i=0;i<ordos.size();i++ ){
+			if(ordos.get(i).equals(ordoTmp)){
+				return ordos.get(i);
+			}
+		}
+		ordo.setMotif("failed to find ordo");
+		return ordo;
+	}
+	public List<String> getMedecins(){
+		return this.medecins;
 	}
 	public CotationsMois getCotListMois(String mois, String annee){
 		CotationsMois cotMois=new CotationsMois();

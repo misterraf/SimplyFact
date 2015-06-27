@@ -136,8 +136,36 @@ V2.1.1 :
 - FIXED : definition cotation : AMI + AIS => "" + xAISx
 - FIXED : ajout patient sans cot. cliquer patient, modifier cotation, ajout nouvelle cotation. Le tick a disparu, mais l'acte reste enregistre (present dans la liste)
 	
+V2.2 :
+- gestion des ordonnances :
+	- DONE : nouvelle class ordonnance :
+		- date prescription
+		- date prise d'effet
+		- date fin (==duree+date prise effet)
+		- medecin traitant
+		- motif de l'ordonnance (ex : ss cut, bas de cont etc)
+		- fichier associe
+		- envoye a VF ou pas
+	- DONE : pop up liste ordos arrivees a echeance au lancement
+	- DONE : edit Fiche Patient pour inclure 
+		- DONE : liste ordos
+		- DONE : bouton ajout ordo
+		- DONE : bouton suppr ordro selectionnée
+		- DONE : bouton voir ordo selectionnée
+		- DONE : Icones boutons
+	- DONE : nouveau GUI Ajout Ordo lie au patient. 
+		- DONE : saisies dates
+		- DONE : medecin traitant (ajout / suppression)
+		- DONE : Motif
+		- DONE : Gestion de fichier
+		- DONE : pop up quand ok avec copie du fichier et affichage du nom du fichier copié
+		- DONE : icones boutons
+- DONE : changer mode selection JTable de filcheliste
+
+	
 TBD :
 -----
+- splash screen speedup ?
 - fusionner 2 patients selectionnes
 - definition d'une nouvelle cotation : si pas de cotation par defaut, elle devient la cot par defaut
 - menu utilisateur avec 
@@ -171,22 +199,19 @@ TBD :
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 
-tbd v2.2
-- GUI gestion des ordonnances :
-	- nouvelle class ordonnance :
-		- date debut
-		- date prise d'effet
-		- date fin (==duree+date prise effet)
-		- medecin traitant
-		- motif de l'ordonnance (ex : ss cut, bas de cont etc)
-		- fichier associe
-	- pop up liste ordos arrivees a echeance au lancement
-	- visualiser ordo.pdf
-	- btn sur fiche patient
-	- btn pour gerer les ordos dans main() -> liste ordos classé par : ? nom ? date d'exp ?
-	- actions sur la liste : + / - / editer
-	- menu ordonnances
+tbd v2.3
+	- nouveau GUI liste ordos a partir du main
+		- table liste ordos tri par patient ? date fin ? date prescr ? laisser le choix ?
+		- switch en cours / toutes
+		- bouton creation de repertoire d'envoi -> lignes selectionnés marquées comme envoyees
+		- bouton remove mark as sent
+		- bouton view selected (si juste une selection, pop up erreur sinon)
+	- demande suppression du fichier associe quand del ordo
+	- retablir selection dans la liste apres delordo	
+	- check presistence ordos quand merge db...	 	
+
 	
+- 
 Bugs :
 ------
 essayer importCsv avec un patient sans cotation

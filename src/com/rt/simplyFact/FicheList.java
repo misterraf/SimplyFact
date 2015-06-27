@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 public class FicheList extends JFrame {
 	private ImageIcon btnIcon1 = new ImageIcon(getClass().getResource("/find.png"));
@@ -65,6 +66,7 @@ public class FicheList extends JFrame {
 		tableActes.getColumn("Prenom").setPreferredWidth(105);
 		tableActes.getColumn("Dup").setPreferredWidth(30);
 		tableActes.getColumn("Cotation").setPreferredWidth(205);
+		tableActes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		//RowSorter<TableModel> sorter = new TableRowSorter<TableModel>(model);
 		//tableActes.setRowSorter(sorter);
 		pan.add(new JScrollPane(tableActes),BorderLayout.CENTER);
@@ -83,6 +85,7 @@ public class FicheList extends JFrame {
 	public int getSelectedLine(){
 		int selLine;
 		selLine=this.tableActes.getSelectedRow();
+		if (selLine==this.tableActes.getRowCount()-1) {return -1;}
 		return selLine;
 	}
 	public void setSelectedLine(int selLine){

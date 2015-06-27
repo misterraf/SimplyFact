@@ -30,7 +30,7 @@ public class DefCotDialog extends JDialog {
 	private ImageIcon btnIcon3 = new ImageIcon(getClass().getResource("/add.png"));
 	private ImageIcon btnIcon4 = new ImageIcon(getClass().getResource("/close.png"));
 	private JButton btnOK=new JButton("OK",btnIcon2);
-	private JButton btnCancel=new JButton("Cancel",btnIcon4);
+	private JButton btnCancel=new JButton("Fermer",btnIcon4);
 	private JButton btnNewMatin=new JButton(btnIcon3);
 	private JButton btnNewMidi=new JButton(btnIcon3);
 	private JButton btnNewSoir=new JButton(btnIcon3);

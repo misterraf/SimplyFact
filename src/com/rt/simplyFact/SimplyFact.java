@@ -109,7 +109,7 @@ public class SimplyFact extends JFrame {
 	private JMenuItem item3_2=new JMenuItem("Stats");
 	private JMenuItem item3_3=new JMenuItem("Debug : liste actes du jour");
 	private JComboBox soignantCB=new JComboBox();
-	private String version="2.1";
+	private String version="2.2";
 	private Cabinet cab=new Cabinet();
 	private List<ActeJour> listActesJour=new ArrayList<ActeJour>();
 	private int crtDayOrder=0;
@@ -339,10 +339,11 @@ public class SimplyFact extends JFrame {
 		expPdfBtn.addActionListener(new ExpPdfBtnListener());
 		expXlsBtn.addActionListener(new ListBtnListener());
 		//importCsvBtn.addActionListener(new ImpCsvBtnListener());
-		leftArrowBtn.addActionListener(new LeftBtnListener());
+		leftArrowBtn.addActionListener(new LeftBtnListener()); 
 		rightArrowBtn.addActionListener(new RightBtnListener());
 		calendarBtn.addActionListener(new CalBtnListener());
 		statsBtn.addActionListener(new StatsBtnListener());
+
 		WindowListener exitListener = new WindowAdapter() {
 
 			@Override
@@ -566,6 +567,9 @@ public class SimplyFact extends JFrame {
 						fp.setFichePatInfo(pat, mois, annee, crtSoignant);
 						fp.setVisible(true);
 						fp.changeBtn.addActionListener(new ChangeBtnListener());
+						fp.addOrdoBtn.addActionListener(new AddOrdoBtnListener());
+						fp.delOrdoBtn.addActionListener(new DelOrdoBtnListener());
+
 					}	else {
 						if (column==3){
 							int idx =cab.getPatientIdx(tableau.getValueAt(row, 1).toString());
@@ -646,6 +650,49 @@ public class SimplyFact extends JFrame {
 			}
 		}
 	}
+	class AddOrdoBtnListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			Patient pat=cab.patients.get(cab.getPatientIdx(fp.pat));
+			AddOrdoDialog newOrdoDial=new AddOrdoDialog(null,"Nouvelle Ordonnance pour"+pat.toString(),true);
+			
+			String patName="";
+			if(pat.getCivilite()!=null) patName=pat.getCivilite().toString();
+			patName=patName+pat.getNom();
+			if((pat.getPrenom()!=null)&&!(pat.getPrenom().equals(""))) patName=patName+pat.getPrenom();
+			newOrdoDial.setData(pat.getMedecins(),patName);
+			Ordonnance newOrdo=newOrdoDial.showAddOrdo();
+			if(!newOrdo.getMotif().equals("cancelled")){
+				pat.addOrdo(newOrdo);
+				//fp.pat.addOrdo(newOrdo);
+				if (!pat.getMedecins().contains(newOrdo.getMedecin())){
+					pat.addMedecin(newOrdo.getMedecin());
+				}
+				fp.refreshOrdoList();
+				cab.setModified(true);
+			}
+
+		}
+	}
+	class DelOrdoBtnListener implements ActionListener{
+
+		public void actionPerformed(ActionEvent event) {
+			Patient pat=cab.patients.get(cab.getPatientIdx(fp.pat));
+			if (fp.listOrdos.getSelectedRow()>=0){
+				String date= fp.listOrdos.getValueAt(fp.listOrdos.getSelectedRow(),0).toString();
+				String motif= fp.listOrdos.getValueAt(fp.listOrdos.getSelectedRow(),1).toString();
+				String medecin= fp.listOrdos.getValueAt(fp.listOrdos.getSelectedRow(),2).toString();
+				if(!date.equals("")){
+					Ordonnance ordo=pat.getOrdo(date,motif,medecin);
+					fp.pat.delOrdo(ordo);
+					System.out.println("deleting :"+ordo.toString());
+					fp.refreshOrdoList();
+					cab.setModified(true);
+
+				}
+			}
+		}
+	}	
+
 	class ChangeBtnListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent event) {
@@ -1093,6 +1140,8 @@ public class SimplyFact extends JFrame {
 		}
 	}	
 
+
+	
 	public void initTable(){
 		// mod pour SF v1.2.3
 //		File dir=new File("Archives");
@@ -1260,11 +1309,70 @@ public class SimplyFact extends JFrame {
 			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement (-> v1.3)");
 			
 		}
+		if (cab.getVersion()==1.3){
+			Cabinet cabTmp=new Cabinet();
+			Patient patTmp;
+			for (int i=0;i<cab.patients.size();i++){
+				patTmp=new Patient();
+				patTmp=cab.patients.get(i);
+				patTmp.setOrdos(new ArrayList<Ordonnance>());
+				patTmp.setMedecins(new ArrayList<String>());
+				cabTmp.addPatient(patTmp);
+				//System.out.println("adding patient :"+patTmp);
+			}
+			for (int i=0;i<cab.soignants.size();i++){
+				cabTmp.addSoignant(cab.soignants.get(i));
+			}
+			cabTmp.setCrtSoignant(cab.getCrtSoignant());
+			cabTmp.setVersion(1.4);
+			cabTmp.setModified(true);
+			cabTmp.addSyncPath(cab.getSyncPath());
+
+			cab=cabTmp;
+			cabTmp=null;
+
+
+			Date date=new Date();
+			String fileNameOut="Archives\\archive_";
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			fileNameOut=fileNameOut+sdf.format(date)+".patched.fdb";
+			writeArchive(cab,fileNameOut,false);
+			
+			
+			
+			File fPatch=new File("archive_crt.fdb");
+			if (fPatch.exists()){fPatch.delete();}
+			writeArchive(cab,"archive_crt.fdb",false);
+			JOptionPane.showMessageDialog(null, "Base de donnée mise à jour correctement (-> v1.4)");
+		}
 		String path=cab.getSyncPath();
 		UidSyncPath UID=new UidSyncPath();
 		System.out.println("Sync path of this machine ("+UID.getUID()+"): "+path);
-	
+		checkOrdoList();
 		
+	}
+	public void checkOrdoList(){
+		System.out.println("Checking Validité Ordonnances");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Patient pat;
+		Ordonnance ordo;
+		for (int i=0;i<cab.patients.size();i++){
+			pat=cab.patients.get(i);
+			for (int j=0;j<pat.getOrdos().size();j++){
+				ordo=pat.getOrdos().get(j);
+				
+				if(!ordo.isArchived()){
+					//System.out.println(crtDate.toString()+" " +ordo.toString()+" "+ordo.getDateFin().compareTo(crtDate));
+					if(ordo.getDateFin().compareTo(crtDate)>0){
+						
+						pat.archiveOrdo(ordo);
+
+						cab.setModified(true);
+
+					}
+				}
+			}
+		}
 	}
 	public void refreshList(){
 //		mise a jour db pour version 1.1
@@ -1752,7 +1860,7 @@ public class SimplyFact extends JFrame {
 	int returnVal = chooser.showOpenDialog(null);
 	if(returnVal == JFileChooser.APPROVE_OPTION) {
 		String fileName=chooser.getSelectedFile().getAbsolutePath();
-		System.out.println("You chose to open this file: " +fileName );
+		//System.out.println("You chose to open this file: " +fileName );
 		try {
 			//patients.clear();
 			br = new BufferedReader(new FileReader(fileName));
