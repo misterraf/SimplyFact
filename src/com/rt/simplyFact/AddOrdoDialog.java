@@ -124,7 +124,7 @@ public class AddOrdoDialog extends JDialog {
 		dateY2Box.add(btnCal2);
 		dateY3Box.add(new JLabel("Durée : "));
 		dateY3Box.add(dureeNTF);
-		dateY3Box.add(new JLabel(" fois par "));
+		dateY3Box.add(new JLabel(" "));
 		dateY3Box.add(comboJjMm);
 		dateFinLb.setText("Date fin :");
 		dateY4Box.add(dateFinLb);

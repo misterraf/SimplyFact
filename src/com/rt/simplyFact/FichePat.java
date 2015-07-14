@@ -407,7 +407,7 @@ public class FichePat extends JFrame {
 				String motif= listOrdos.getValueAt(listOrdos.getSelectedRow(),1).toString();
 				String medecin= listOrdos.getValueAt(listOrdos.getSelectedRow(),2).toString();
 				if(!date.equals("")){
-					Ordonnance ordo=pat.getOrdo(date,motif,medecin);
+					Ordonnance ordo=pat.getOrdo(date,motif);
 					String fileName=ordo.getFileName();
 					File viewFile=new File(fileName);
 					try {

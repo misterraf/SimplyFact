@@ -162,9 +162,19 @@ V2.2 :
 		- DONE : icones boutons
 - DONE : changer mode selection JTable de filcheliste
 
+V2.3 :
+	- DONE nouveau GUI liste ordos a partir du main
+		- DONE : table liste ordos tri par patient ? date fin ? date prescr ? laisser le choix ?
+		- DONE : switch en cours / toutes / non envoyées
+		- DONE : bouton creation de repertoire d'envoi -> lignes selectionnés marquées comme envoyees
+		- DONE : bouton remove mark as sent
+		- DONE : bouton view selected (si juste une selection, pop up erreur sinon)
 	
 TBD :
 -----
+- demande suppression du fichier associe quand del ordo
+- retablir selection dans la liste apres delordo	
+- check presistence ordos quand merge db...	 	
 - splash screen speedup ?
 - fusionner 2 patients selectionnes
 - definition d'une nouvelle cotation : si pas de cotation par defaut, elle devient la cot par defaut
@@ -199,16 +209,6 @@ TBD :
 - un seul fichier db dans un serveur dedie ?
 - mecanisme de sauvegarde / synchro
 
-tbd v2.3
-	- nouveau GUI liste ordos a partir du main
-		- table liste ordos tri par patient ? date fin ? date prescr ? laisser le choix ?
-		- switch en cours / toutes
-		- bouton creation de repertoire d'envoi -> lignes selectionnés marquées comme envoyees
-		- bouton remove mark as sent
-		- bouton view selected (si juste une selection, pop up erreur sinon)
-	- demande suppression du fichier associe quand del ordo
-	- retablir selection dans la liste apres delordo	
-	- check presistence ordos quand merge db...	 	
 
 	
 - 

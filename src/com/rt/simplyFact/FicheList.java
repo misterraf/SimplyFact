@@ -18,7 +18,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 public class FicheList extends JFrame {
-	private ImageIcon btnIcon1 = new ImageIcon(getClass().getResource("/find.png"));
+	private ImageIcon btnIcon1 = new ImageIcon(getClass().getResource("/close.png"));
 	private ImageIcon btnIcon2 = new ImageIcon(getClass().getResource("/save.png"));
 	private ImageIcon btnIcon3 = new ImageIcon(getClass().getResource("/importCsv.png"));
 	private ImageIcon btnIcon4 = new ImageIcon(getClass().getResource("/upicon.png"));

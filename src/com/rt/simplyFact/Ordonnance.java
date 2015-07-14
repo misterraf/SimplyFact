@@ -34,7 +34,7 @@ public class Ordonnance  implements Serializable {
 		this.fileName="";
 		
 	}
-	public Ordonnance(String date,String motif,String medecin){
+	public Ordonnance(String date,String motif){
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try{
 			this.datePresc=sdf.parse(date);
@@ -46,7 +46,7 @@ public class Ordonnance  implements Serializable {
 		this.motif=motif;
 		this.dureeN=0;
 		this.dureeStr="jours";
-		this.medecin=medecin;
+		this.medecin="";
 		this.sent=false;
 		this.archived=false;
 		this.fileName="";
@@ -143,11 +143,6 @@ public class Ordonnance  implements Serializable {
 			if (other.datePresc != null)
 				return false;
 		} else if (!datePresc.equals(other.datePresc))
-			return false;
-		if (medecin == null) {
-			if (other.medecin != null)
-				return false;
-		} else if (!medecin.equals(other.medecin))
 			return false;
 		if (motif == null) {
 			if (other.motif != null)

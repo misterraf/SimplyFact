@@ -706,8 +706,8 @@ public class Patient implements Serializable{
 	public List<Ordonnance> getOrdos(){
 		return this.ordos;
 	}
-	public Ordonnance getOrdo(String date,String motif,String medecin){
-		Ordonnance ordoTmp=new Ordonnance(date,motif,medecin);
+	public Ordonnance getOrdo(String date,String motif){
+		Ordonnance ordoTmp=new Ordonnance(date,motif);
 		Ordonnance ordo=new Ordonnance();
 		for (int i=0;i<ordos.size();i++ ){
 			if(ordos.get(i).equals(ordoTmp)){
